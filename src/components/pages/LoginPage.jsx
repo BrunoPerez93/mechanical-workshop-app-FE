@@ -26,7 +26,6 @@ const LoginPage = () => {
   const handleLoginClick = async (e) => {
     e.preventDefault();
     try {
-      console.log('llego');
       const response = await fetch("http://localhost:8080/api/v1/login", {
         method: "POST",
         headers: {
@@ -42,6 +41,9 @@ const LoginPage = () => {
         console.log("Token:", result.token);
 
         navigate('/detalle');
+        onInputChange({ target: { name: 'username', value: '' } });
+        onInputChange({ target: { name: 'password', value: '' } });
+
       } else {
         const errorResponse = await response.json();
         console.error("Login failed:", errorResponse.message);
@@ -50,6 +52,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error("Error during login:", error);
+      setError("An error occurred during login. Please try again.");
     }
   };
 
@@ -59,7 +62,7 @@ const LoginPage = () => {
     <div className="container">
       <div className="row">
 
-        <form className=" text-center">
+        <form className=" text-center" onSubmit={handleLoginClick}>
           <h1 style={styleH1}>Login</h1>
 
           <h2>Usuario</h2>
@@ -79,14 +82,14 @@ const LoginPage = () => {
           <InputComponent
             type="password"
             className="form-control"
-            placeholder="Username"
+            placeholder="Password"
             name="password"
             value={password}
             onChange={onInputChange}
             autoComplete="current-password"
           />
 
-          <button className="btn btn-primary mt-2 col-2" onClick={handleLoginClick}>Login</button>
+          <button className="btn btn-primary mt-2 col-2" type="submit" >Login</button>
         </form>
 
       </div>
