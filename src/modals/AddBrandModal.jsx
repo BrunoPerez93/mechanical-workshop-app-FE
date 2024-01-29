@@ -23,6 +23,7 @@ const AddBrandModal = ({
             name="brandName"
             value={brandName}
             onChange={onInputChange}
+            required
           />
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>

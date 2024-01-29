@@ -1,23 +1,44 @@
-import { Routes, Route } from "react-router-dom";
-import DetallaTrabajo from "../pages/DetallaTrabajo";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import DetalleTrabajo from "../pages/DetallaTrabajo";
 import BusquedaCliente from '../pages/BusquedaCliente'
 import AdministrarUsuario from '../pages/AdministrarUsuario'
 import AdministrarTecnico from '../pages/AdministrarTecnico'
 import LoginPage from "../pages/LoginPage";
-/* import Logout from "../Logout" */
-
+import Navigation from "./Navigation";
+import PropTypes from "prop-types";
 
 const Routing = () => {
+ 
   return (
     <Routes>
-      <Route path='/detalle' element={<DetallaTrabajo />} />
-      <Route path='/busqueda' element={<BusquedaCliente />} />
-      <Route path='/admi-user' element={<AdministrarUsuario />} />
-      <Route path='/admin-tecnico' element={<AdministrarTecnico />} />
-      <Route path='/' element={<LoginPage />} />
-      {/* <Route path='/' element={<Logout />} /> */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path='/' element={<WithNav value={<DetalleTrabajo />} />} />
+        <Route path='/busqueda' element={<WithNav value={<BusquedaCliente />} />} />
+
+        <Route path='/admi-user' element={<WithNav value={<AdministrarUsuario />} />} />
+
+        <Route path='/admin-tecnico' element={<WithNav value={<AdministrarTecnico />} />} />
+      </Route>
     </Routes>
   )
 }
+
+const WithNav = ({ value }) => {
+  return (<div>
+    <Navigation />
+    {value}
+  </div>)
+}
+
+const ProtectedRoute = () => {
+  const isAuthenticated = !!localStorage.getItem('token');
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+};
+
+WithNav.propTypes = {
+  value: PropTypes.object.isRequired,
+}
+
 
 export default Routing;

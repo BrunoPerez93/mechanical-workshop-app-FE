@@ -4,17 +4,13 @@ import '../styles/detalleDeTrabajo.css'
 import AddClientModal from "../../modals/AddClientModal";
 import AddModelModal from "../../modals/AddModelModal";
 import AddBrandModal from "../../modals/AddBrandModal";
-import SelectComponent from "../SelectComponent";
-import InputComponent from "../InputComponent";
-import CheckboxGroup from "../CheckBoxGroup";
+import { apiCall } from "../../utility/common";
+import WorkForm from "../Work/WorkForm";
 
-const DetallaTrabajo = () => {
+const DetalleTrabajo = () => {
 
   //#region FormData
 
-  const currentDate = new Date();
-
-  const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`
 
   const { formState, onInputChange, resetForm } = useForm({
     brandName: '',
@@ -45,24 +41,9 @@ const DetallaTrabajo = () => {
   const {
     brandName,
     carName,
-    matricula,
-    km,
     name,
     lastname,
-    abs,
-    engine,
-    airbag,
-    steer,
-    ta,
-    goodPayer,
-    badPayer,
-    normalPayer,
     ci,
-    cel,
-    reclame,
-    autoParts,
-    observations,
-    userName,
     handWork,
     priceAutoParts,
     total,
@@ -82,17 +63,6 @@ const DetallaTrabajo = () => {
     brandName: formState.brandName,
   }
 
-  const testigoData = {
-    abs: formState.abs || false,
-    engine: formState.engine || false,
-    airbag: formState.airbag || false,
-    steer: formState.steer || false,
-    ta: formState.ta || false,
-    goodPayer: formState.goodPayer || false,
-    badPayer: formState.badPayer || false,
-    normalPayer: formState.normalPayer || false,
-  };
-
   //#endregion
 
   //#region States
@@ -106,21 +76,26 @@ const DetallaTrabajo = () => {
   const [showModelModal, setShowModelModal] = useState(false);
   const [showBrandModal, setShowBrandModal] = useState(false);
 
+  const [ciError, setCiError] = useState(null);
+
   const [works, setWorks] = useState([]);
 
-  const [checkboxData, setCheckboxData] = useState(() => {
-    const initialData = {};
-    Object.keys(testigoData).forEach(key => {
-      initialData[key] = false;
-    });
-    return initialData;
+  const [checkboxData, setCheckboxData] = useState({
+    abs: false,
+    engine: false,
+    airbag: false,
+    steer: false,
+    ta: false,
+    goodPayer: false,
+    badPayer: false,
+    normalPayer: false,
   });
 
 
   //#endregion
 
 
-  //#region Precio Total 
+  //#region Precio Total
 
   useEffect(() => {
     const newTotal = parseFloat(handWork) + parseFloat(priceAutoParts);
@@ -143,7 +118,7 @@ const DetallaTrabajo = () => {
       onInputChange({ target: { name: 'brandName', value: selectedBrand.brandName } });
 
     } else {
-      console.error(`Modelo with id ${newBrandId} not found.`);
+      console.error(`Brand with id ${newBrandId} not found.`);
     }
   };
 
@@ -209,7 +184,7 @@ const DetallaTrabajo = () => {
   const handleCloseBrandModal = () => {
     setShowBrandModal(false);
   };
-  
+
   const handleCheckbox = (key, value) => {
     setCheckboxData(prevData => ({
       ...prevData,
@@ -224,12 +199,10 @@ const DetallaTrabajo = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/clients", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "clients",
+        "GET",
+      );
 
       if (response.ok) {
         const clientList = await response.json();
@@ -251,14 +224,19 @@ const DetallaTrabajo = () => {
 
   const handleSaveClient = async (event) => {
     event.preventDefault();
+    const existingClient = clients.find((client) => client.ci === ci);
+
+    if(existingClient) {
+      setCiError('Cedula ya ingresada');
+      return
+    }
+
     try {
-      const response = await fetch("http://localhost:8080/api/v1/clients", {
-        method: "POST",
-        body: JSON.stringify(clientData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "clients",
+        "POST",
+        JSON.stringify(clientData)
+      )
 
       if (response.ok) {
         fetchClients();
@@ -281,12 +259,11 @@ const DetallaTrabajo = () => {
 
   const fetchBrands = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/brands", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "brands",
+        "GET",
+      );
+
 
       if (response.ok) {
         const brandList = await response.json();
@@ -310,13 +287,11 @@ const DetallaTrabajo = () => {
   const handleSaveBrand = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/v1/brands", {
-        method: "POST",
-        body: JSON.stringify(brandData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "brands",
+        "POST",
+        JSON.stringify(brandData),
+      );
 
       if (response.ok) {
         fetchBrands();
@@ -340,12 +315,10 @@ const DetallaTrabajo = () => {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/carsModels", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "carsModels",
+        "GET",
+      );
 
       if (response.ok) {
         const carModelList = await response.json();
@@ -367,14 +340,19 @@ const DetallaTrabajo = () => {
 
   const handleSaveModels = async (event) => {
     event.preventDefault();
+
+    const brandId = brands.find((brand) => brand.brandName === formState.brandName)?.id;
+    const updatedModelData = {
+      ...modelData,
+      brandId,
+    };
+
     try {
-      const response = await fetch("http://localhost:8080/api/v1/carsModels", {
-        method: "POST",
-        body: JSON.stringify(modelData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "carsModels",
+        "POST",
+        JSON.stringify(updatedModelData),
+      );
 
       if (response.ok) {
         fetchModels();
@@ -397,12 +375,10 @@ const DetallaTrabajo = () => {
 
   const fetchMechanic = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/mechanics", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "mechanics",
+        "GET",
+      );
 
       if (response.ok) {
         const mechanicList = await response.json();
@@ -429,12 +405,10 @@ const DetallaTrabajo = () => {
 
   const fetchWorks = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/works", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "works",
+        "GET",
+      );
 
       if (response.ok) {
         const workList = await response.json();
@@ -455,21 +429,40 @@ const DetallaTrabajo = () => {
   }, []);
 
   const handleTrabajoSubmit = async (event) => {
-    const updatedFormState = { ...formState, ...checkboxData };
-
     event.preventDefault();
-    try {
-      const response = await fetch("http://localhost:8080/api/v1/works", {
-        method: "POST",
-        body: JSON.stringify(updatedFormState),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
 
+    const updatedFormState = {
+      ...formState,
+      ...checkboxData,
+      km: parseFloat(formState.km),
+      cel: parseFloat(formState.cel),
+      handWork: parseFloat(formState.handWork),
+      priceAutoParts: parseFloat(formState.priceAutoParts),
+      total: parseFloat(formState.total),
+    };
+    console.log('Form Data:', updatedFormState);
+    try {
+      const response = await apiCall(
+        "works",
+        "POST",
+        JSON.stringify(updatedFormState),
+      );
+
+      console.log('response ', response);
       if (response.ok) {
+        console.log('Work created successfully.');
         fetchWorks();
         resetForm();
+        setCheckboxData({
+          abs: false,
+          engine: false,
+          airbag: false,
+          steer: false,
+          ta: false,
+          goodPayer: false,
+          badPayer: false,
+          normalPayer: false,
+        }); 
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el modelo",
@@ -486,181 +479,26 @@ const DetallaTrabajo = () => {
 
   return (
     <>
-      <form onSubmit={handleTrabajoSubmit}>
 
-        <div className="title">
-          <h1>Detalles del trabajo</h1>
-          <span>Fecha: {formattedDate}</span>
-        </div>
+      <WorkForm
+        brands={brands}
+        models={models}
+        clients={clients}
+        mechanics={mechanics}
+        handleBrandChange={handleBrandChange}
+        handleModelChange={handleModelChange}
+        handleAgregarBrand={handleAgregarBrand}
+        handleAgregarModel={handleAgregarModel}
+        handleTrabajoSubmit={handleTrabajoSubmit}
+        formState={formState}
+        handleCheckbox={handleCheckbox}
+        onInputChange={onInputChange}
+        handleAgregarClient={handleAgregarClient}
+        handleClientChange={handleClientChange}
+        handleMechanicChange={handleMechanicChange}
+      />
 
 
-        <div className="container">
-          <div className="row" >
-
-            {/* MARCA */}
-            <div className="col-xs-6 col-md-6 d-flex required">
-              <h2>Marca</h2>
-
-              <SelectComponent
-                options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
-                onChange={handleBrandChange}
-                value={brandName}
-              />
-
-              <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
-            </div>
-
-            {/* MODELO */}
-            <div className="col-xs-6 col-md-6 d-flex">
-              <h2>Modelo</h2>
-
-              <SelectComponent
-                options={models.map((model) => ({ value: model.id, label: model.carName }))}
-                value={models.carName}
-                onChange={handleModelChange}
-              />
-
-              <button className="btn btn-primary m-2" onClick={handleAgregarModel}>Agregar</button>
-            </div>
-
-            {/* MATRICULA */}
-            <div className="d-flex col-xs-6 col-md-6">
-              <h2>Matriucla</h2>
-              <InputComponent
-                type="text"
-                name="matricula"
-                value={matricula}
-                placeholder="matricula"
-                onChange={onInputChange}
-              />
-            </div>
-
-            {/* KM */}
-            <div className="d-flex col-xs-6 col-md-6">
-              <h2>KM</h2>
-              <InputComponent
-                type="number"
-                placeholder="km"
-                name="km"
-                value={km}
-                onChange={onInputChange}
-              />
-            </div>
-
-            {/* CLIENTE */}
-            <div className="d-flex col-xs-6 col-md-6">
-              <h2>Cliente</h2>
-
-              <SelectComponent
-                options={clients.map((client) => ({ value: client.ci, label: `${client.name} ${client.lastname} ${client.ci}` }))}
-                value={clients.ci}
-                onChange={handleClientChange}
-              />
-              <button className="btn btn-primary m-2" onClick={handleAgregarClient}>Agregar</button>
-            </div>
-
-            {/* CELULAR */}
-            <div className="d-flex col-xs-6 col-md-6">
-              <h2>Celular</h2>
-              <InputComponent
-                type="number"
-                placeholder="celular"
-                name="cel"
-                value={cel}
-                onChange={onInputChange}
-              />
-            </div>
-
-            <CheckboxGroup
-              options={Object.keys(testigoData).map(key => ({ key, label: key }))}
-              onCheckboxChange={handleCheckbox}
-            />
-
-            {/* RECLAMOS */}
-            <div className="form-floating">
-              <h3>Fallos segun reclamacion del cliente</h3>
-              <textarea
-                className="form-control m-2"
-                name="reclame"
-                value={reclame}
-                onChange={onInputChange}
-                style={{ height: '100px' }}
-              />
-            </div>
-
-            {/* REPUESTOS */}
-            <div className="form-floating">
-              <h3>Repuestos: nuevo, alternativo, original o subministrado por el cliente</h3>
-              <textarea
-                className="form-control m-2"
-                name="autoParts"
-                value={autoParts}
-                onChange={onInputChange}
-                style={{ height: '100px' }}
-              />
-            </div>
-
-            {/* OBSERVACIONES */}
-            <div className="form-floating">
-              <h3>Observaciones</h3>
-              <textarea
-                className="form-control m-2"
-                name="observations"
-                value={observations}
-                onChange={onInputChange}
-                style={{ height: '100px' }}
-              />
-            </div>
-
-            {/* MECANICOS */}
-            <h2>Tecnico</h2>
-
-            <SelectComponent
-              options={mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName }))}
-              value={mechanics.userName}
-              onChange={handleMechanicChange}
-            />
-
-            {/* PRECIOS */}
-            <h2>Precios</h2>
-
-            <div>
-              <h4>Mano de obra</h4>
-              <InputComponent
-                type="number"
-                placeholder="Precio"
-                name="handWork"
-                value={handWork}
-                onChange={onInputChange}
-              />
-            </div>
-
-            <div>
-              <h4>Repuesto</h4>
-              <InputComponent
-                type="number"
-                placeholder="Precio"
-                name="priceAutoParts"
-                value={priceAutoParts}
-                onChange={onInputChange}
-              />
-            </div>
-
-            <div>
-              <h4>Total</h4>
-              <InputComponent
-                type="number"
-                placeholder="Total"
-                name="total"
-                value={total}
-                onChange={onInputChange}
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary m-2" >Registrar</button>
-          </div>
-        </div>
-      </form>
 
       <AddClientModal
         show={showClientModal}
@@ -670,6 +508,7 @@ const DetallaTrabajo = () => {
         name={name}
         lastname={lastname}
         ci={ci}
+        ciError={ciError}
       />
 
       <AddModelModal
@@ -694,4 +533,4 @@ const DetallaTrabajo = () => {
   );
 };
 
-export default DetallaTrabajo;
+export default DetalleTrabajo;

@@ -10,7 +10,7 @@ const AddModelModal = ({
   onInputChange,
   carName,
   brands,
-  handleBrandChange={handleBrandChange},
+  handleBrandChange = { handleBrandChange },
 }) => {
   return (
     <Modal show={show} onHide={handleClose}>
@@ -28,6 +28,7 @@ const AddModelModal = ({
               name="carName"
               value={carName}
               onChange={onInputChange}
+              required
             />
           </div>
 
@@ -36,9 +37,11 @@ const AddModelModal = ({
             <SelectComponent
               options={brands && brands.map((brand) => ({ value: brand.id, label: brand.brandName }))}
               onChange={handleBrandChange}
-              value={brands && brands.brandName} // Assuming carName represents the selected brand ID
+              value={brands && brands.brandName} 
+              required
             />
           </div>
+
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const useForm = (initialForm = {}) => {
   const [formState, setFormState] = useState(initialForm);
+  
 
   const onInputChange = (event) => {
     const { name, value, type, checked } = event.target;

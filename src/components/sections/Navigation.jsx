@@ -1,24 +1,16 @@
 import { Link } from "react-router-dom"
 import { Navbar, Nav } from "react-bootstrap"
+import { logout } from "../../utility/common";
 
 const Navigation = () => {
-
-
-
 
   return (
     <Navbar bg="light" expand="lg" className="ps-3">
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
       <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          <Link className="nav-link" to="/detalle">
-
-          </Link>
-        </Nav>
-
         <Nav className="mx-auto">
-          <Link className="nav-link" to="/detalle">
+          <Link className="nav-link" to="/">
             Detalla Trabajo
           </Link>
           <Link className="nav-link" to="/busqueda">
@@ -30,7 +22,7 @@ const Navigation = () => {
           <Link className="nav-link" to="/admin-tecnico">
             Administrar Tecnico
           </Link>
-          <Link className="nav-link" to="/logout">
+          <Link className="nav-link" onClick={logout}>
             Logout
           </Link>
         </Nav>

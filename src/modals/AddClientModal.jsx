@@ -10,6 +10,7 @@ const AddClientModal = ({
   name,
   lastname,
   ci,
+  ciError,
 }) => {
   return (
     <Modal show={show} onHide={handleClose}>
@@ -17,6 +18,7 @@ const AddClientModal = ({
         <Modal.Title>Agregar Cliente</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+
         <form onSubmit={handleSaveClient}>
           <input
             type="text"
@@ -25,6 +27,7 @@ const AddClientModal = ({
             name="name"
             value={name}
             onChange={onInputChange}
+            required
           />
           <input
             type="text"
@@ -33,6 +36,7 @@ const AddClientModal = ({
             name="lastname"
             value={lastname}
             onChange={onInputChange}
+            required
           />
           <input
             type="text"
@@ -41,15 +45,17 @@ const AddClientModal = ({
             name="ci"
             value={ci}
             onChange={onInputChange}
+            required
           />
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Cerrar
-          </Button>
-          <Button variant="primary" type="submit">
-            Guardar Cliente
-          </Button>
-        </Modal.Footer>
+          {ciError && <div className="error-message">{ciError}</div>}
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+              Cerrar
+            </Button>
+            <Button variant="primary" type="submit">
+              Guardar Cliente
+            </Button>
+          </Modal.Footer>
         </form>
       </Modal.Body>
     </Modal>
@@ -64,6 +70,7 @@ AddClientModal.propTypes = {
   name: PropTypes.string.isRequired,
   lastname: PropTypes.string.isRequired,
   ci: PropTypes.string.isRequired,
+  ciError: PropTypes.string,
 };
 
 export default AddClientModal;

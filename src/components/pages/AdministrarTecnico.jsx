@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import useForm from "../../hooks/useForm";
+import { apiCall } from "../../utility/common";
+import { MechanicForm, MechanicList } from "../Mechanics/MechanicForm";
 
 const AdministrarTecnico = () => {
 
@@ -10,16 +12,12 @@ const AdministrarTecnico = () => {
     password: '',
   });
 
-  const { userName, password } = formState;
-
   const fetchMechanic = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/mechanics", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "mechanics",
+        "GET",
+      );
 
       if (response.ok) {
         const mechanicsList = await response.json();
@@ -42,13 +40,11 @@ const AdministrarTecnico = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/v1/mechanics", {
-        method: "POST",
-        body: JSON.stringify(formState),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "mechanics",
+        "POST",
+        JSON.stringify(formState),
+      );
 
       if (response.ok) {
         fetchMechanic();
@@ -67,60 +63,14 @@ const AdministrarTecnico = () => {
   return (
     <div className="container">
       <div className="row">
+      <MechanicForm
+          formState={formState}
+          onInputChange={onInputChange}
+          resetForm={resetForm}
+          handleSubmit={handleSubmit}
+        />
 
-        <form className="text-center mt-2" onSubmit={handleSubmit}>
-          <h1>Administrar Tecnico</h1>
-          <h2>Usuario</h2>
-
-          <input
-            type="username"
-            className="form-control"
-            placeholder="Nombre Completo"
-            name="userName"
-            value={userName}
-            onChange={onInputChange}
-            autoComplete="userName"
-          />
-
-          <h2>Contraseña</h2>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="password"
-            name="password"
-            value={password}
-            onChange={onInputChange}
-            autoComplete="current-password"
-          />
-
-          <button
-            className="btn btn-primary mt-2 col-12"
-            type="submit"
-          > Crear </button>
-
-          <h2 className="text-center mt-5">Lista de Tecnicos</h2>
-          <table  className="table text-center">
-            <thead>
-              <tr>
-                <th className="col-sm-6 col-md-6">Nombre</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mechanics && mechanics.length ? (
-                mechanics.map((mechanic) => (
-                  <tr key={mechanic.id}>
-                    <td>{mechanic.userName}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3">No hay usuarios</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-        </form>
+        <MechanicList mechanics={mechanics} />
       </div>
     </div>
   )

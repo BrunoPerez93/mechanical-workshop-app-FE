@@ -1,9 +1,9 @@
 
 import { useNavigate } from "react-router-dom";
 import useForm from "../../hooks/useForm";
-import PropTypes from 'prop-types'
 import InputComponent from "../InputComponent";
 import { useState } from "react";
+import { apiCall } from "../../utility/common";
 
 const LoginPage = () => {
   const [error, setError] = useState('');
@@ -26,23 +26,23 @@ const LoginPage = () => {
   const handleLoginClick = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/v1/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await apiCall(
+        "login",
+        "POST",
+        JSON.stringify({
           userName: formState.username,
           password: formState.password,
         }),
-      });
+      );
+      
       if (response.ok) {
-        const result = await response.json();
-        console.log("Token:", result.token);
+        const { token } = await response.json();
 
-        navigate('/detalle');
         onInputChange({ target: { name: 'username', value: '' } });
         onInputChange({ target: { name: 'password', value: '' } });
+        localStorage.setItem('token', token);
+
+        navigate('/');
 
       } else {
         const errorResponse = await response.json();
@@ -98,8 +98,5 @@ const LoginPage = () => {
   )
 }
 
-LoginPage.propTypes = {
-  onLogin: PropTypes.func.isRequired,
-}
 
 export default LoginPage

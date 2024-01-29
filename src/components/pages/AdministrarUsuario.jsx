@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import useForm from "../../hooks/useForm";
+import { apiCall } from "../../utility/common";
+import {AdminForm, UserList} from "../Users/AdminForm";
 
 const AdministrarUsuario = () => {
+
+
   const [users, setUsers] = useState([]);
   const { formState, onInputChange, resetForm } = useForm({
     userName: "",
@@ -9,22 +13,18 @@ const AdministrarUsuario = () => {
     role: "",
   });
 
-  const { userName, password, role } = formState;
-
   const searchOptions = {
     Admin: "Administrador",
     Operation: "Secretaria",
     Mechanic: "Mecanico",
-  };
+  }; 
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "users",
+        "GET",
+      );
 
       if (response.ok) {
         const userList = await response.json();
@@ -42,18 +42,16 @@ const AdministrarUsuario = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []); 
-  
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://localhost:8080/api/v1/users", {
-        method: "POST",
-        body: JSON.stringify(formState),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(
+        "users",
+        "POST",
+        JSON.stringify(formState),
+      );
 
       if (response.ok) {
         fetchUsers();
@@ -69,82 +67,27 @@ const AdministrarUsuario = () => {
     }
   };
 
-  return (
-    <div className="container">
-      <div className="row">
+ 
+    return (
 
-        <form className="text-center mt-2" onSubmit={handleSubmit}>
-          <h1>Administrar Usuario</h1>
-          <h2>Usuario</h2>
+      <div className="container">
+        <div className="row">
 
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Nombre"
-            name="userName"
-            value={userName}
-            onChange={onInputChange}
-            autoComplete="userName"
-          />
+        <AdminForm
+          formState={formState}
+          onInputChange={onInputChange}
+          resetForm={resetForm}
+          handleSubmit={handleSubmit}
+        />
 
-          <h2>Contraseña</h2>
-          <input
-            type="password"
-            className="form-control"
-            placeholder="password"
-            name="password"
-            value={password}
-            onChange={onInputChange}
-            autoComplete="current-password"
-          />
+        <UserList 
+        users={users}
+        searchOptions={searchOptions}
+        />
 
-          <h2>Rol</h2>
-          <select
-            className="form-select"
-            onChange={onInputChange}
-            name="role"
-            value={role}>
-            <option value=''>Seleccione Rol...</option>
-            {Object.entries(searchOptions).map(([key, value]) =>
-              (<option key={key} value={key}>
-                {value}
-              </option>)
-            )}
-          </select>
-
-          <button
-            className="btn btn-primary mt-2 col-12"
-            type="submit"
-          > Crear </button>
-
-        </form>
-
-        <h2 className="text-center mt-5">Lista de usuarios</h2>
-        <table className="table text-center">
-          <thead>
-            <tr>
-              <th className="col-sm-6 col-md-6" >Nombre</th>
-              <th className="col-sm-6 col-md-6" >Rol</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users && users.length ? (
-              users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.userName}</td>
-                  <td>{searchOptions[user.role]}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3">No hay usuarios</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        </div>
       </div>
-    </div>
-  )
+    )
 }
 
 export default AdministrarUsuario
