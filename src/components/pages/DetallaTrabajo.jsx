@@ -13,7 +13,7 @@ const DetalleTrabajo = () => {
 
 
   const { formState, onInputChange, resetForm } = useForm({
-    brandName: '',
+
     carName: '',
     matricula: '',
     km: '',
@@ -32,7 +32,6 @@ const DetalleTrabajo = () => {
     reclame: '',
     autoParts: '',
     observations: '',
-    userName: '',
     handWork: '',
     priceAutoParts: '',
     total: '',
@@ -57,6 +56,7 @@ const DetalleTrabajo = () => {
 
   const modelData = {
     carName: formState.carName,
+    brandId: formState.brandId,
   }
 
   const brandData = {
@@ -110,12 +110,11 @@ const DetalleTrabajo = () => {
 
   //#region handleModal
   const handleBrandChange = (event) => {
-
     const newBrandId = event.target.value;
     const selectedBrand = brands.find((brand) => brand.id === parseInt(newBrandId));
 
     if (selectedBrand) {
-      onInputChange({ target: { name: 'brandName', value: selectedBrand.brandName } });
+      onInputChange({ target: { name: 'brandId', value: selectedBrand.id } });
 
     } else {
       console.error(`Brand with id ${newBrandId} not found.`);
@@ -127,7 +126,7 @@ const DetalleTrabajo = () => {
     const selectedModel = models.find((model) => model.id === parseInt(newModelId));
 
     if (selectedModel) {
-      onInputChange({ target: { name: 'carName', value: selectedModel.carName } });
+      onInputChange({ target: { name: 'carModelId', value: selectedModel.id } });
 
     } else {
       console.error(`Modelo with id ${newModelId} not found.`);
@@ -135,17 +134,17 @@ const DetalleTrabajo = () => {
   };
 
   const handleClientChange = (event) => {
-    const newClientCi = event.target.value;
-    const selectedClient = clients.find((client) => client.ci === newClientCi);
-
+    const newClientId = event.target.value;
+    const selectedClient = clients.find((client) => client.id === parseInt(newClientId));
 
     if (selectedClient) {
+      onInputChange({ target: { name: 'clientId', value: selectedClient.id } });
       onInputChange({ target: { name: 'name', value: selectedClient.name } });
       onInputChange({ target: { name: 'lastname', value: selectedClient.lastname } });
       onInputChange({ target: { name: 'ci', value: selectedClient.ci } });
 
     } else {
-      console.error(`Cliente with ci ${newClientCi} not found.`);
+      console.error(`Cliente with id ${newClientId} not found.`);
     }
   };
 
@@ -154,7 +153,7 @@ const DetalleTrabajo = () => {
     const slectedMechanic = mechanics.find((mechanic) => mechanic.id === parseInt(newMechanicId));
 
     if (slectedMechanic) {
-      onInputChange({ target: { name: 'userName', value: slectedMechanic.userName } });
+      onInputChange({ target: { name: 'mechanicId', value: slectedMechanic.id } });
 
     } else {
       console.error(`Tecnico with id ${newMechanicId} not found.`);
@@ -226,7 +225,7 @@ const DetalleTrabajo = () => {
     event.preventDefault();
     const existingClient = clients.find((client) => client.ci === ci);
 
-    if(existingClient) {
+    if (existingClient) {
       setCiError('Cedula ya ingresada');
       return
     }
@@ -236,7 +235,7 @@ const DetalleTrabajo = () => {
         "clients",
         "POST",
         JSON.stringify(clientData)
-      )
+      );
 
       if (response.ok) {
         fetchClients();
@@ -338,20 +337,15 @@ const DetalleTrabajo = () => {
     fetchModels();
   }, []);
 
+
   const handleSaveModels = async (event) => {
     event.preventDefault();
-
-    const brandId = brands.find((brand) => brand.brandName === formState.brandName)?.id;
-    const updatedModelData = {
-      ...modelData,
-      brandId,
-    };
-
+    console.log("Before API Call:", modelData);
     try {
       const response = await apiCall(
         "carsModels",
         "POST",
-        JSON.stringify(updatedModelData),
+        JSON.stringify(modelData),
       );
 
       if (response.ok) {
@@ -382,6 +376,7 @@ const DetalleTrabajo = () => {
 
       if (response.ok) {
         const mechanicList = await response.json();
+
         setMechanics(mechanicList);
       } else {
         console.error(
@@ -412,6 +407,7 @@ const DetalleTrabajo = () => {
 
       if (response.ok) {
         const workList = await response.json();
+
         setWorks(workList);
       } else {
         console.error(
@@ -440,29 +436,17 @@ const DetalleTrabajo = () => {
       priceAutoParts: parseFloat(formState.priceAutoParts),
       total: parseFloat(formState.total),
     };
-    console.log('Form Data:', updatedFormState);
     try {
+      console.log(updatedFormState);
       const response = await apiCall(
         "works",
         "POST",
         JSON.stringify(updatedFormState),
       );
-
-      console.log('response ', response);
       if (response.ok) {
         console.log('Work created successfully.');
         fetchWorks();
         resetForm();
-        setCheckboxData({
-          abs: false,
-          engine: false,
-          airbag: false,
-          steer: false,
-          ta: false,
-          goodPayer: false,
-          badPayer: false,
-          normalPayer: false,
-        }); 
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el modelo",
@@ -519,6 +503,7 @@ const DetalleTrabajo = () => {
         carName={carName}
         brands={brands}
         handleBrandChange={handleBrandChange}
+        modelData={modelData}
       />
 
       <AddBrandModal

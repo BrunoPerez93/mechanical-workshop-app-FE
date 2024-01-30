@@ -9,7 +9,6 @@ const AdministrarTecnico = () => {
 
   const { formState, onInputChange, resetForm } = useForm({
     userName: '',
-    password: '',
   });
 
   const fetchMechanic = async () => {

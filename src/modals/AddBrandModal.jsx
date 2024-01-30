@@ -44,7 +44,7 @@ AddBrandModal.propTypes = {
   handleClose: PropTypes.func.isRequired,
   handleSaveBrand: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
-  brandName: PropTypes.string.isRequired,
+  brandName: PropTypes.string,
 
 };
 

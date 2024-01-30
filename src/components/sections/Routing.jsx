@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import DetalleTrabajo from "../pages/DetallaTrabajo";
-import BusquedaCliente from '../pages/BusquedaCliente'
+import BusquedaTrabajo from '../pages/BusquedaTrabajo'
 import AdministrarUsuario from '../pages/AdministrarUsuario'
 import AdministrarTecnico from '../pages/AdministrarTecnico'
 import LoginPage from "../pages/LoginPage";
@@ -14,7 +14,7 @@ const Routing = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path='/' element={<WithNav value={<DetalleTrabajo />} />} />
-        <Route path='/busqueda' element={<WithNav value={<BusquedaCliente />} />} />
+        <Route path='/busqueda' element={<WithNav value={<BusquedaTrabajo />} />} />
 
         <Route path='/admi-user' element={<WithNav value={<AdministrarUsuario />} />} />
 

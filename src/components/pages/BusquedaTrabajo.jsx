@@ -1,6 +1,6 @@
 import useForm from "../../hooks/useForm";
 
-const BusquedaCliente = () => {
+const BusquedaTrabajo = () => {
 
   const { formState, onInputChange } = useForm({
     searchSelect: '',
@@ -11,9 +11,7 @@ const BusquedaCliente = () => {
 
   const searchOptions = [
     'Matricula',
-    'Nombre',
-    'Modelo',
-    'Marca',
+    'CI',
     'KM',
     'Calular',
     'Fecha',
@@ -28,7 +26,7 @@ const BusquedaCliente = () => {
       <div className="row">
 
         <div className="text-center mt-2">
-          <h1>Clientes</h1>
+          <h1>Trabajo</h1>
           <select
             className="form-select"
             name="searchSelect"
@@ -85,4 +83,4 @@ const BusquedaCliente = () => {
   )
 }
 
-export default BusquedaCliente
+export default BusquedaTrabajo

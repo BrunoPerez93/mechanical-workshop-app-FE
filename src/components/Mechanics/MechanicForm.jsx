@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 
 export const MechanicForm = ({ formState, onInputChange, handleSubmit }) => {
-  const { userName, password } = formState;
+  const { userName } = formState;
   
 
   return (
@@ -10,25 +10,13 @@ export const MechanicForm = ({ formState, onInputChange, handleSubmit }) => {
       <h2>Usuario</h2>
 
       <input
-        type="username"
+        type="text"
         className="form-control"
         placeholder="Nombre Completo"
         name="userName"
         value={userName}
         onChange={onInputChange}
         autoComplete="userName"
-        required
-      />
-
-      <h2>Contraseña</h2>
-      <input
-        type="password"
-        className="form-control"
-        placeholder="password"
-        name="password"
-        value={password}
-        onChange={onInputChange}
-        autoComplete="current-password"
         required
       />
 
@@ -70,7 +58,7 @@ export const MechanicList = ({ mechanics }) => {
 };
 
 MechanicForm.propTypes = {
-  formState: PropTypes.array.isRequired,
+  formState: PropTypes.object.isRequired,
   onInputChange: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired,
   resetForm: PropTypes.func.isRequired,

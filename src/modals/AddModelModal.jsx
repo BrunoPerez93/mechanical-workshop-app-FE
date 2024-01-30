@@ -10,7 +10,9 @@ const AddModelModal = ({
   onInputChange,
   carName,
   brands,
-  handleBrandChange = { handleBrandChange },
+  handleBrandChange,
+  modelData,
+
 }) => {
   return (
     <Modal show={show} onHide={handleClose}>
@@ -35,9 +37,9 @@ const AddModelModal = ({
           <div className="form-group">
             <label>Marca</label>
             <SelectComponent
-              options={brands && brands.map((brand) => ({ value: brand.id, label: brand.brandName }))}
+              options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
+              value={modelData.brandId}
               onChange={handleBrandChange}
-              value={brands && brands.brandName} 
               required
             />
           </div>
@@ -61,10 +63,10 @@ AddModelModal.propTypes = {
   handleClose: PropTypes.func.isRequired,
   handleSaveModels: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
-  carName: PropTypes.string.isRequired,
+  carName: PropTypes.string,
   handleBrandChange: PropTypes.func.isRequired,
   brands: PropTypes.array.isRequired,
-
+  modelData: PropTypes.object.isRequired,
 };
 
 export default AddModelModal;

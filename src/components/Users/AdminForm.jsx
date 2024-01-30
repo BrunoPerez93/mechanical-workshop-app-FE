@@ -105,5 +105,5 @@ AdminForm.propTypes = {
 
 UserList.propTypes = {
   users: PropTypes.array.isRequired,
-  searchOptions: PropTypes.object.isRequired,
+  searchOptions: PropTypes.array.isRequired,
 };

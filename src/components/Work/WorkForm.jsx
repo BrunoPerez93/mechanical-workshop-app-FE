@@ -60,7 +60,7 @@ const WorkForm = ({
             <h2>Marca</h2>
             <SelectComponent
               options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
-              value={brands.brandName}
+              value={brands.id}
               onChange={handleBrandChange}
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
@@ -71,7 +71,7 @@ const WorkForm = ({
             <h2>Modelo</h2>
             <SelectComponent
               options={models.map((model) => ({ value: model.id, label: model.carName }))}
-              value={models.carName}
+              value={models.id}
               onChange={handleModelChange}
               required
             />
@@ -108,8 +108,8 @@ const WorkForm = ({
           <div className="d-flex col-xs-6 col-md-6">
             <h2>Cliente</h2>
             <SelectComponent
-              options={clients.map((client) => ({ value: client.ci, label: `${client.name} ${client.lastname} ${client.ci}` }))}
-              value={clients.ci}
+              options={clients.map((client) => ({ value: client.id, label: `${client.name} ${client.lastname} ${client.ci}` }))}
+              value={clients.id}
               onChange={handleClientChange}
               required
             />
@@ -177,7 +177,7 @@ const WorkForm = ({
           <h2>Técnico</h2>
           <SelectComponent
             options={mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName }))}
-            value={mechanics.userName}
+            value={mechanics.id}
             onChange={handleMechanicChange}
             required
           />

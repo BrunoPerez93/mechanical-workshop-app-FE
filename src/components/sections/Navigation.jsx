@@ -14,7 +14,7 @@ const Navigation = () => {
             Detalla Trabajo
           </Link>
           <Link className="nav-link" to="/busqueda">
-            Busqueda Cliente
+            Busqueda Trabajo
           </Link>
           <Link className="nav-link" to="/admi-user">
             Administrar Usuario
