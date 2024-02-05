@@ -67,9 +67,9 @@ AddClientModal.propTypes = {
   handleClose: PropTypes.func.isRequired,
   handleSaveClient: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired,
-  lastname: PropTypes.string.isRequired,
-  ci: PropTypes.string.isRequired,
+  name: PropTypes.string,
+  lastname: PropTypes.string,
+  ci: PropTypes.string,
   ciError: PropTypes.string,
 };
 

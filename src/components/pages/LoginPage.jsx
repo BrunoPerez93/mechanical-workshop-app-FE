@@ -4,11 +4,13 @@ import useForm from "../../hooks/useForm";
 import InputComponent from "../InputComponent";
 import { useState } from "react";
 import { apiCall } from "../../utility/common";
+import { useAuth } from "../Context/AuthContext";
+
 
 const LoginPage = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
+  const { dispatch } = useAuth();
 
   const styleH1 = {
     margin: '20px',
@@ -23,7 +25,7 @@ const LoginPage = () => {
 
   const { username, password } = formState;
 
-  const handleLoginClick = async (e) => {
+  const handleLoginClick = async (e,) => {
     e.preventDefault();
     try {
       const response = await apiCall(
@@ -34,15 +36,24 @@ const LoginPage = () => {
           password: formState.password,
         }),
       );
-      
+
       if (response.ok) {
-        const { token } = await response.json();
+        const { token, userId, role, userName } = await response.json();
+
+        dispatch({
+          type: 'user',
+          payload: { id: userId, role, username: userName },
+        });
+
+        console.log('Role stored in AuthContext:', role);
 
         onInputChange({ target: { name: 'username', value: '' } });
         onInputChange({ target: { name: 'password', value: '' } });
         localStorage.setItem('token', token);
 
-        navigate('/');
+        setTimeout(() => {
+          navigate('/');
+        }, 100);
 
       } else {
         const errorResponse = await response.json();

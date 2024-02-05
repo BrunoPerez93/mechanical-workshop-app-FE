@@ -10,8 +10,9 @@ const AddModelModal = ({
   onInputChange,
   carName,
   brands,
-  handleBrandChange,
+  handleBrandChange, 
   modelData,
+  selectedBrandId
 
 }) => {
   return (
@@ -20,7 +21,7 @@ const AddModelModal = ({
         <Modal.Title>Agregar Modelo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <form onSubmit={handleSaveModels}>
+        <form onSubmit={(e) => handleSaveModels(e, modelData.brandId)}>
           <div className="form-group">
             <label>Nombre del Modelo</label>
             <input
@@ -37,8 +38,14 @@ const AddModelModal = ({
           <div className="form-group">
             <label>Marca</label>
             <SelectComponent
-              options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
-              value={modelData.brandId}
+              options={
+                brands.length > 0
+                  ? brands.map((brand) => ({
+                    value: brand.id,
+                    label: brand.brandName
+                  }))
+                  : []}
+                  value={selectedBrandId || ''}
               onChange={handleBrandChange}
               required
             />
@@ -64,9 +71,10 @@ AddModelModal.propTypes = {
   handleSaveModels: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   carName: PropTypes.string,
-  handleBrandChange: PropTypes.func.isRequired,
+  handleBrandChange: PropTypes.func,
   brands: PropTypes.array.isRequired,
-  modelData: PropTypes.object.isRequired,
+  selectedBrandId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  modelData: PropTypes.object,
 };
 
 export default AddModelModal;

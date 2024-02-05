@@ -15,7 +15,7 @@ const AdministrarUsuario = () => {
 
   const searchOptions = {
     Admin: "Administrador",
-    Operation: "Secretaria",
+    Management: "Secretaria",
     Mechanic: "Mecanico",
   }; 
 

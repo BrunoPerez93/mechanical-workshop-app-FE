@@ -1,12 +1,17 @@
-export const logout = (navigate) => {
+const apiUrl = import.meta.env.VITE_API_URL;
+
+export const logout = () => {
   localStorage.removeItem('token');
-  navigate('/login');
+  console.log('borro localstorate');
 };
 
-export const apiCall = async (path, method, body, isWithoutToken) =>{
- 
+export const apiCall = async (path, method, body, queryParams, isWithoutToken) => {
+  const url = new URL(`${apiUrl}${path}`);
+  if (queryParams)
+    Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
+
   return fetch(
-    `${import.meta.env.VITE_API_URL}${path}`,
+    url,
     {
       method,
       body,
@@ -15,4 +20,15 @@ export const apiCall = async (path, method, body, isWithoutToken) =>{
         ...(!isWithoutToken && { "Authorization": `Bearer ${localStorage.getItem('token')}` })
       },
     }
-  )}
+  )
+}
+
+export const Roles = {
+  Admin: "Admin",
+  Management: "Management",
+  Mechanic: "Mechanic",
+}
+
+export const validateManagementMinimumRole = (role) => [Roles.Admin, Roles.Management].includes(role)
+
+export const validateAdminRole = (role) => Roles.Admin === role

@@ -14,11 +14,8 @@ const DetalleTrabajo = () => {
 
   const { formState, onInputChange, resetForm } = useForm({
 
-    carName: '',
     matricula: '',
     km: '',
-    name: '',
-    lastname: '',
     abs: false,
     engine: false,
     airbag: false,
@@ -27,7 +24,6 @@ const DetalleTrabajo = () => {
     goodPayer: false,
     badPayer: false,
     normalPayer: false,
-    ci: '',
     cel: '',
     reclame: '',
     autoParts: '',
@@ -39,10 +35,6 @@ const DetalleTrabajo = () => {
 
   const {
     brandName,
-    carName,
-    name,
-    lastname,
-    ci,
     handWork,
     priceAutoParts,
     total,
@@ -56,7 +48,6 @@ const DetalleTrabajo = () => {
 
   const modelData = {
     carName: formState.carName,
-    brandId: formState.brandId,
   }
 
   const brandData = {
@@ -76,7 +67,13 @@ const DetalleTrabajo = () => {
   const [showModelModal, setShowModelModal] = useState(false);
   const [showBrandModal, setShowBrandModal] = useState(false);
 
+  const [selectedBrandId, setSelectedBrandId] = useState(null);
+
+  const [selectedModels, setSelectedModels] = useState([]);
+
+
   const [ciError, setCiError] = useState(null);
+
 
   const [works, setWorks] = useState([]);
 
@@ -109,17 +106,35 @@ const DetalleTrabajo = () => {
   //#endregion
 
   //#region handleModal
-  const handleBrandChange = (event) => {
+
+  const handleBrandChange = async (event) => {
     const newBrandId = event.target.value;
     const selectedBrand = brands.find((brand) => brand.id === parseInt(newBrandId));
 
     if (selectedBrand) {
-      onInputChange({ target: { name: 'brandId', value: selectedBrand.id } });
+      const response = await apiCall(
+        `carsModels?brandId=${selectedBrand.id}`,
+        "GET",
+      );
 
+      if (response.ok) {
+        const modelList = await response.json();
+        setSelectedModels(modelList);
+
+        onInputChange({ target: { name: 'carModelId', value: selectedBrand.id } });
+        setSelectedBrandId(selectedBrand.id);
+      } else {
+        console.error(
+          "Error in the server response when fetching models for the brand",
+          response.statusText
+        );
+      }
     } else {
       console.error(`Brand with id ${newBrandId} not found.`);
     }
   };
+
+
 
   const handleModelChange = (event) => {
     const newModelId = event.target.value;
@@ -139,10 +154,6 @@ const DetalleTrabajo = () => {
 
     if (selectedClient) {
       onInputChange({ target: { name: 'clientId', value: selectedClient.id } });
-      onInputChange({ target: { name: 'name', value: selectedClient.name } });
-      onInputChange({ target: { name: 'lastname', value: selectedClient.lastname } });
-      onInputChange({ target: { name: 'ci', value: selectedClient.ci } });
-
     } else {
       console.error(`Cliente with id ${newClientId} not found.`);
     }
@@ -166,6 +177,7 @@ const DetalleTrabajo = () => {
 
   const handleAgregarModel = () => {
     setShowModelModal(true);
+    onInputChange({ target: { name: 'carModelId', value: '' } });
   };
 
   const handleAgregarBrand = () => {
@@ -223,7 +235,8 @@ const DetalleTrabajo = () => {
 
   const handleSaveClient = async (event) => {
     event.preventDefault();
-    const existingClient = clients.find((client) => client.ci === ci);
+
+    const existingClient = clients.find((client) => client.ci === clients.ci);
 
     if (existingClient) {
       setCiError('Cedula ya ingresada');
@@ -334,23 +347,30 @@ const DetalleTrabajo = () => {
   };
 
   useEffect(() => {
+
     fetchModels();
   }, []);
 
 
   const handleSaveModels = async (event) => {
     event.preventDefault();
-    console.log("Before API Call:", modelData);
+
+    const updatedModelData = {
+      ...modelData,
+      brandId: selectedBrandId,
+    };
+
     try {
       const response = await apiCall(
         "carsModels",
         "POST",
-        JSON.stringify(modelData),
+        JSON.stringify(updatedModelData),
       );
 
       if (response.ok) {
         fetchModels();
         resetForm();
+        setShowModelModal(false);
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el modelo",
@@ -361,6 +381,7 @@ const DetalleTrabajo = () => {
       console.error("Error", error);
     }
     setShowModelModal(false);
+    fetchModels();
   };
 
   //#endregion
@@ -437,12 +458,12 @@ const DetalleTrabajo = () => {
       total: parseFloat(formState.total),
     };
     try {
-      console.log(updatedFormState);
       const response = await apiCall(
         "works",
         "POST",
         JSON.stringify(updatedFormState),
       );
+    
       if (response.ok) {
         console.log('Work created successfully.');
         fetchWorks();
@@ -466,12 +487,12 @@ const DetalleTrabajo = () => {
 
       <WorkForm
         brands={brands}
-        models={models}
+        models={selectedModels}
         clients={clients}
         mechanics={mechanics}
-        handleBrandChange={handleBrandChange}
         handleModelChange={handleModelChange}
         handleAgregarBrand={handleAgregarBrand}
+        handleBrandChange={handleBrandChange}
         handleAgregarModel={handleAgregarModel}
         handleTrabajoSubmit={handleTrabajoSubmit}
         formState={formState}
@@ -489,21 +510,21 @@ const DetalleTrabajo = () => {
         handleClose={handleCloseClientModal}
         handleSaveClient={handleSaveClient}
         onInputChange={onInputChange}
-        name={name}
-        lastname={lastname}
-        ci={ci}
         ciError={ciError}
       />
 
       <AddModelModal
         show={showModelModal}
         handleClose={handleCloseModelModal}
-        handleSaveModels={handleSaveModels}
+        handleSaveModels={(event) => handleSaveModels(event, selectedBrandId)}
+        handleBrandChange={(e) => {
+          handleBrandChange(e);
+          setSelectedBrandId(e.target.value);
+        }}
         onInputChange={onInputChange}
-        carName={carName}
         brands={brands}
-        handleBrandChange={handleBrandChange}
         modelData={modelData}
+        selectedBrandId={selectedBrandId}
       />
 
       <AddBrandModal
@@ -511,7 +532,7 @@ const DetalleTrabajo = () => {
         handleClose={handleCloseBrandModal}
         handleSaveBrand={handleSaveBrand}
         onInputChange={onInputChange}
-        brandName={brandName}
+        brandName={brandName || ''}
       />
 
     </>

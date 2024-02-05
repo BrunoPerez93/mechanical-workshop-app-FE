@@ -43,6 +43,7 @@ const WorkForm = ({
     normalPayer: formState.normalPayer || false,
   };
 
+
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
@@ -71,7 +72,7 @@ const WorkForm = ({
             <h2>Modelo</h2>
             <SelectComponent
               options={models.map((model) => ({ value: model.id, label: model.carName }))}
-              value={models.id}
+              value={formState.carModelId}
               onChange={handleModelChange}
               required
             />
@@ -232,7 +233,7 @@ WorkForm.propTypes = {
   clients: PropTypes.array.isRequired,
   models: PropTypes.array.isRequired,
   mechanics: PropTypes.array.isRequired,
-  handleBrandChange: PropTypes.func.isRequired,
+  handleBrandChange: PropTypes.func,
   handleModelChange: PropTypes.func.isRequired,
   handleAgregarBrand: PropTypes.func.isRequired,
   handleAgregarModel: PropTypes.func.isRequired,

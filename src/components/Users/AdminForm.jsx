@@ -7,7 +7,7 @@ export const AdminForm = ({ formState, onInputChange, handleSubmit }) => {
 
   const searchOptions = {
     Admin: "Administrador",
-    Operation: "Secretaria",
+    Management: "Secretaria",
     Mechanic: "Mecanico",
   };
 
@@ -97,13 +97,13 @@ export const UserList = ({ users, searchOptions }) => {
 }
 
 AdminForm.propTypes = {
-  formState: PropTypes.array.isRequired,
+  formState: PropTypes.object.isRequired,
   onInputChange: PropTypes.func.isRequired,  
   handleSubmit: PropTypes.func.isRequired,
-  searchOptions: PropTypes.object.isRequired,
+  searchOptions: PropTypes.object,
 };
 
 UserList.propTypes = {
   users: PropTypes.array.isRequired,
-  searchOptions: PropTypes.array.isRequired,
+  searchOptions: PropTypes.object,
 };

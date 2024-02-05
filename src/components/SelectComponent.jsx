@@ -27,7 +27,7 @@ const SelectComponent = ({ options, value, onChange }) => {
 SelectComponent.propTypes = {
   options: PropTypes.array.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),  
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func,
 };
 
 export default SelectComponent;
