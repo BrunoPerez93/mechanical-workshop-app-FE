@@ -19,6 +19,7 @@ const WorkForm = ({
   handleAgregarClient,
   handleClientChange,
   handleMechanicChange,
+  errorMessage,
 
 }) => {
   const {
@@ -220,6 +221,7 @@ const WorkForm = ({
               onChange={onInputChange}
             />
           </div>
+          {errorMessage && <div className="alert alert-danger error-message m-2">{errorMessage}</div>}
 
           <button type="submit" className="btn btn-primary m-2" >Registrar</button>
 
@@ -245,6 +247,7 @@ WorkForm.propTypes = {
   handleAgregarClient: PropTypes.func.isRequired,
   handleClientChange: PropTypes.func.isRequired,
   handleMechanicChange: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string,
 };
 
 export default WorkForm;

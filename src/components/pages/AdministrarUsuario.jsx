@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import useForm from "../../hooks/useForm";
 import { apiCall } from "../../utility/common";
-import {AdminForm, UserList} from "../Users/AdminForm";
+import { AdminForm, UserList } from "../Users/AdminForm";
 
 const AdministrarUsuario = () => {
 
 
   const [users, setUsers] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
+
   const { formState, onInputChange, resetForm } = useForm({
     userName: "",
     password: "",
@@ -17,7 +19,7 @@ const AdministrarUsuario = () => {
     Admin: "Administrador",
     Management: "Secretaria",
     Mechanic: "Mecanico",
-  }; 
+  };
 
   const fetchUsers = async () => {
     try {
@@ -46,6 +48,7 @@ const AdministrarUsuario = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     try {
       const response = await apiCall(
         "users",
@@ -56,6 +59,10 @@ const AdministrarUsuario = () => {
       if (response.ok) {
         fetchUsers();
         resetForm();
+        setSuccessMessage('Usuario creado.');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000);
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
@@ -67,11 +74,11 @@ const AdministrarUsuario = () => {
     }
   };
 
- 
-    return (
 
-      <div className="container">
-        <div className="row">
+  return (
+
+    <div className="container">
+      <div className="row">
 
         <AdminForm
           formState={formState}
@@ -80,14 +87,18 @@ const AdministrarUsuario = () => {
           handleSubmit={handleSubmit}
         />
 
-        <UserList 
-        users={users}
-        searchOptions={searchOptions}
+        {successMessage && (
+          <div className="alert alert-success mt-2">{successMessage}</div>
+        )}
+
+        <UserList
+          users={users}
+          searchOptions={searchOptions}
         />
 
-        </div>
       </div>
-    )
+    </div>
+  )
 }
 
 export default AdministrarUsuario

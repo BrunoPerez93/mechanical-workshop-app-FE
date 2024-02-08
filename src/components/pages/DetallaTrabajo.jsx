@@ -75,7 +75,7 @@ const DetalleTrabajo = () => {
   const [ciError, setCiError] = useState(null);
   const [brandError, setBrandError] = useState(null);
   const [modelError, setModelError] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState('');
 
 
   const [works, setWorks] = useState([]);
@@ -98,7 +98,7 @@ const DetalleTrabajo = () => {
 
   useEffect(() => {
     const newTotal = parseFloat(handWork) + parseFloat(priceAutoParts);
-    const formattedTotal = isNaN(newTotal) ? '' : newTotal.toString();
+    const formattedTotal = isNaN(newTotal) ? 0 : newTotal;
 
     if (total !== formattedTotal) {
       onInputChange({ target: { name: 'total', value: formattedTotal } });
@@ -106,6 +106,18 @@ const DetalleTrabajo = () => {
   }, [handWork, priceAutoParts, total, onInputChange]);
 
   //#endregion
+
+  const validateForm = () => {
+    if (!formState.matricula || !formState.km || !formState.clientId || !formState.mechanicId) {
+      setErrorMessage('Todos los campos son requeridos.');
+      setTimeout(() => {
+        setErrorMessage('');
+      }, 5000);
+      return false;
+    }
+    setErrorMessage('');
+    return true;
+  };
 
   //#region handleModal
 
@@ -141,7 +153,7 @@ const DetalleTrabajo = () => {
   const handleModelChange = (event) => {
     const newModelId = event.target.value;
     const selectedModel = selectedModels.find((model) => model.id === parseInt(newModelId));
-  
+
     if (selectedModel) {
       onInputChange({ target: { name: 'carModelId', value: selectedModel.id } });
     } else {
@@ -368,7 +380,7 @@ const DetalleTrabajo = () => {
   const handleSaveModels = async (event) => {
     event.preventDefault();
 
-     const existingModel = models.find(
+    const existingModel = models.find(
       (model) => model.carName === modelData.carName);
 
     if (existingModel) {
@@ -389,20 +401,20 @@ const DetalleTrabajo = () => {
       );
 
       if (response.ok) {
-           const updatedModelsResponse = await apiCall(
-        `carsModels?brandId=${selectedBrandId}`,
-        "GET",
-      );
-
-      if (updatedModelsResponse.ok) {
-        const updatedModelList = await updatedModelsResponse.json();
-        setSelectedModels(updatedModelList);
-      } else {
-        console.error(
-          "Error in the server response when fetching models for the brand",
-          updatedModelsResponse.statusText
+        const updatedModelsResponse = await apiCall(
+          `carsModels?brandId=${selectedBrandId}`,
+          "GET",
         );
-      }
+
+        if (updatedModelsResponse.ok) {
+          const updatedModelList = await updatedModelsResponse.json();
+          setSelectedModels(updatedModelList);
+        } else {
+          console.error(
+            "Error in the server response when fetching models for the brand",
+            updatedModelsResponse.statusText
+          );
+        }
         resetForm();
         setShowModelModal(false);
       } else {
@@ -415,7 +427,7 @@ const DetalleTrabajo = () => {
       console.error("Error", error);
     }
     setShowModelModal(false);
-
+    fetchModels();
   };
 
   //#endregion
@@ -482,6 +494,9 @@ const DetalleTrabajo = () => {
   const handleTrabajoSubmit = async (event) => {
     event.preventDefault();
 
+    if (!validateForm()) {
+      return;
+    }
     const updatedFormState = {
       ...formState,
       ...checkboxData,
@@ -499,7 +514,6 @@ const DetalleTrabajo = () => {
       );
 
       if (response.ok) {
-        console.log('Work created successfully.');
         fetchWorks();
         resetForm();
         navigate('/');
@@ -536,6 +550,7 @@ const DetalleTrabajo = () => {
         handleAgregarClient={handleAgregarClient}
         handleClientChange={handleClientChange}
         handleMechanicChange={handleMechanicChange}
+        errorMessage={errorMessage}
       />
 
 

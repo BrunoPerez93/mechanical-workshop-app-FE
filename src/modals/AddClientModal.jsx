@@ -47,7 +47,7 @@ const AddClientModal = ({
             onChange={onInputChange}
             required
           />
-          {ciError && <div className="error-message">{ciError}</div>}
+          {ciError && <div className="alert alert-danger error-message">{ciError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar

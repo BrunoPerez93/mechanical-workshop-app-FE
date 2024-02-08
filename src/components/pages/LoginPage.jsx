@@ -12,6 +12,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { dispatch } = useAuth();
 
+
   const styleH1 = {
     margin: '20px',
     fontSize: '60px',
@@ -27,6 +28,12 @@ const LoginPage = () => {
 
   const handleLoginClick = async (e,) => {
     e.preventDefault();
+
+    if (!formState.username || !formState.password) {
+      setError("Usuario y contraseña son requeridos.");
+      return
+    }
+
     try {
       const response = await apiCall(
         "login",
@@ -44,8 +51,6 @@ const LoginPage = () => {
           type: 'user',
           payload: { id: userId, role, username: userName },
         });
-
-        console.log('Role stored in AuthContext:', role);
 
         onInputChange({ target: { name: 'username', value: '' } });
         onInputChange({ target: { name: 'password', value: '' } });
@@ -104,7 +109,7 @@ const LoginPage = () => {
         </form>
 
       </div>
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger m-2">{error}</div>}
     </div>
   )
 }

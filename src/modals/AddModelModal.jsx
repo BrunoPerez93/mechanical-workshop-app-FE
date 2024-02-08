@@ -51,7 +51,7 @@ const AddModelModal = ({
               required
             />
           </div>
-          {modelError && <div className="error-message">{modelError}</div>}
+          {modelError && <div className="alert alert-danger error-message">{modelError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar

@@ -26,7 +26,7 @@ const AddBrandModal = ({
             onChange={onInputChange}
             required
           />
-           {brandError && <div className="error-message">{brandError}</div>}
+           {brandError && <div className="alert alert-danger error-message">{brandError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar

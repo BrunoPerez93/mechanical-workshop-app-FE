@@ -6,6 +6,7 @@ import { MechanicForm, MechanicList } from "../Mechanics/MechanicForm";
 const AdministrarTecnico = () => {
 
   const [mechanics, setMechanics] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { formState, onInputChange, resetForm } = useForm({
     userName: '',
@@ -48,6 +49,10 @@ const AdministrarTecnico = () => {
       if (response.ok) {
         fetchMechanic();
         resetForm();
+        setSuccessMessage('Tecnico creado')
+        setTimeout(()=>{
+          setSuccessMessage('');
+        }, 5000);
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
@@ -68,6 +73,10 @@ const AdministrarTecnico = () => {
           resetForm={resetForm}
           handleSubmit={handleSubmit}
         />
+
+        {successMessage && (
+          <div className="alert alert-success mt-2">{successMessage}</div>
+        )}
 
         <MechanicList mechanics={mechanics} />
       </div>
