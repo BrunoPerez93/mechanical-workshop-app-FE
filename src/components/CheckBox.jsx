@@ -1,6 +1,18 @@
 import PropTypes from "prop-types";
 
-const CheckBox = ({ id, label, checked, onChange }) => {
+const CheckBox = ({ id, labelKey, checked, onChange }) => {
+
+  const checkboxLabels = {
+    abs: 'ABS',
+    engine: 'Motor',
+    airbag: 'Airbag',
+    steer: 'Direccion',
+    ta: 'TA',
+    goodPayer: 'Buen Pagador',
+    badPayer: 'Mal Pagador',
+    normalPayer: 'Pagador Normal',
+  };
+  
   return (
     <div className="container">
       <div className="row">
@@ -14,7 +26,7 @@ const CheckBox = ({ id, label, checked, onChange }) => {
             onChange={onChange}
             className="form-check-input m-2"
             />
-          <label htmlFor={id}>{label}</label>
+          <label htmlFor={id}>{checkboxLabels[labelKey]}</label>
 
             </div>
         </div>
@@ -25,7 +37,7 @@ const CheckBox = ({ id, label, checked, onChange }) => {
 
 CheckBox.propTypes = {
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  label: PropTypes.string.isRequired,
+  labelKey: PropTypes.string.isRequired,
   checked: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
 

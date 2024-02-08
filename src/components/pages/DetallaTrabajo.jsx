@@ -6,8 +6,13 @@ import AddModelModal from "../../modals/AddModelModal";
 import AddBrandModal from "../../modals/AddBrandModal";
 import { apiCall } from "../../utility/common";
 import WorkForm from "../Work/WorkForm";
+import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+
 
 const DetalleTrabajo = () => {
+  const navigate = useNavigate();
+
 
   //#region FormData
 
@@ -62,17 +67,15 @@ const DetalleTrabajo = () => {
   const [models, setModels] = useState([]);
   const [clients, setClients] = useState([]);
   const [mechanics, setMechanics] = useState([]);
-
   const [showClientModal, setShowClientModal] = useState(false);
   const [showModelModal, setShowModelModal] = useState(false);
   const [showBrandModal, setShowBrandModal] = useState(false);
-
   const [selectedBrandId, setSelectedBrandId] = useState(null);
-
   const [selectedModels, setSelectedModels] = useState([]);
-
-
   const [ciError, setCiError] = useState(null);
+  const [brandError, setBrandError] = useState(null);
+  const [modelError, setModelError] = useState(null);
+
 
 
   const [works, setWorks] = useState([]);
@@ -90,7 +93,6 @@ const DetalleTrabajo = () => {
 
 
   //#endregion
-
 
   //#region Precio Total
 
@@ -138,13 +140,12 @@ const DetalleTrabajo = () => {
 
   const handleModelChange = (event) => {
     const newModelId = event.target.value;
-    const selectedModel = models.find((model) => model.id === parseInt(newModelId));
-
+    const selectedModel = selectedModels.find((model) => model.id === parseInt(newModelId));
+  
     if (selectedModel) {
       onInputChange({ target: { name: 'carModelId', value: selectedModel.id } });
-
     } else {
-      console.error(`Modelo with id ${newModelId} not found.`);
+      console.error(`Model with id ${newModelId} not found.`);
     }
   };
 
@@ -186,14 +187,17 @@ const DetalleTrabajo = () => {
 
   const handleCloseClientModal = () => {
     setShowClientModal(false);
+    setCiError(null);
   };
 
   const handleCloseModelModal = () => {
     setShowModelModal(false);
+    setModelError(null);
   };
 
   const handleCloseBrandModal = () => {
     setShowBrandModal(false);
+    setBrandError(null);
   };
 
   const handleCheckbox = (key, value) => {
@@ -236,7 +240,7 @@ const DetalleTrabajo = () => {
   const handleSaveClient = async (event) => {
     event.preventDefault();
 
-    const existingClient = clients.find((client) => client.ci === clients.ci);
+    const existingClient = clients.find((client) => client.ci === clientData.ci);
 
     if (existingClient) {
       setCiError('Cedula ya ingresada');
@@ -270,6 +274,7 @@ const DetalleTrabajo = () => {
   //#region Fetch Brands
 
   const fetchBrands = async () => {
+
     try {
       const response = await apiCall(
         "brands",
@@ -298,6 +303,14 @@ const DetalleTrabajo = () => {
 
   const handleSaveBrand = async (event) => {
     event.preventDefault();
+
+    const existingBrand = brands.find((brand) => brand.brandName === brandData.brandName);
+
+    if (existingBrand) {
+      setBrandError('Marca ya ingresada')
+      return
+    }
+
     try {
       const response = await apiCall(
         "brands",
@@ -355,6 +368,14 @@ const DetalleTrabajo = () => {
   const handleSaveModels = async (event) => {
     event.preventDefault();
 
+     const existingModel = models.find(
+      (model) => model.carName === modelData.carName);
+
+    if (existingModel) {
+      setModelError(`El modelo ya está ingresado`);
+      return;
+    }
+
     const updatedModelData = {
       ...modelData,
       brandId: selectedBrandId,
@@ -368,7 +389,20 @@ const DetalleTrabajo = () => {
       );
 
       if (response.ok) {
-        fetchModels();
+           const updatedModelsResponse = await apiCall(
+        `carsModels?brandId=${selectedBrandId}`,
+        "GET",
+      );
+
+      if (updatedModelsResponse.ok) {
+        const updatedModelList = await updatedModelsResponse.json();
+        setSelectedModels(updatedModelList);
+      } else {
+        console.error(
+          "Error in the server response when fetching models for the brand",
+          updatedModelsResponse.statusText
+        );
+      }
         resetForm();
         setShowModelModal(false);
       } else {
@@ -381,7 +415,7 @@ const DetalleTrabajo = () => {
       console.error("Error", error);
     }
     setShowModelModal(false);
-    fetchModels();
+
   };
 
   //#endregion
@@ -463,11 +497,12 @@ const DetalleTrabajo = () => {
         "POST",
         JSON.stringify(updatedFormState),
       );
-    
+
       if (response.ok) {
         console.log('Work created successfully.');
         fetchWorks();
         resetForm();
+        navigate('/');
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el modelo",
@@ -525,6 +560,7 @@ const DetalleTrabajo = () => {
         brands={brands}
         modelData={modelData}
         selectedBrandId={selectedBrandId}
+        modelError={modelError}
       />
 
       <AddBrandModal
@@ -533,10 +569,17 @@ const DetalleTrabajo = () => {
         handleSaveBrand={handleSaveBrand}
         onInputChange={onInputChange}
         brandName={brandName || ''}
+        brandError={brandError}
       />
 
     </>
   );
 };
+
+DetalleTrabajo.propTypes = {
+
+  selectedWork: PropTypes.object,
+};
+
 
 export default DetalleTrabajo;

@@ -7,7 +7,8 @@ const AddBrandModal = ({
   handleClose,
   handleSaveBrand,
   onInputChange,
-  brandName
+  brandName,
+  brandError,
 }) => {
   return (
     <Modal show={show} onHide={handleClose}>
@@ -25,6 +26,7 @@ const AddBrandModal = ({
             onChange={onInputChange}
             required
           />
+           {brandError && <div className="error-message">{brandError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar
@@ -45,7 +47,7 @@ AddBrandModal.propTypes = {
   handleSaveBrand: PropTypes.func.isRequired,
   onInputChange: PropTypes.func,
   brandName: PropTypes.string,
-
+  brandError: PropTypes.string,
 };
 
 export default AddBrandModal;

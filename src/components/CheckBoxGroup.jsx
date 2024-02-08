@@ -17,6 +17,7 @@ const CheckboxGroup = ({ options, onCheckboxChange }) => {
     onCheckboxChange(key, updatedCheckboxValues[key]);
   };
 
+  
   return (
     <div className="container">
 
@@ -24,11 +25,11 @@ const CheckboxGroup = ({ options, onCheckboxChange }) => {
 
         <div className="">
           <h2 className="mt-3">Testigos</h2>
-          {options.map(({ key, label }) => (
+          {options.map(({ key }) => (
             <Checkbox
               key={key}
               id={key}
-              label={label}
+              labelKey={key}
               checked={checkboxValues[key]}
               onChange={() => handleCheckboxChange(key)}
             />

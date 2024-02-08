@@ -4,7 +4,10 @@ import Routing from './components/sections/Routing';
 
 
 function App() {
-  return <Routing />
+  return (
+    <Routing />
+
+  )
 }
 
 export default App

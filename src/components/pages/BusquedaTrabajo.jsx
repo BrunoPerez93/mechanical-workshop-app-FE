@@ -10,7 +10,6 @@ import { format, formatISO } from 'date-fns';
 
 const BusquedaTrabajo = () => {
 
-
   const { formState, onInputChange } = useForm({
     searchSelect: '',
     search: '',
@@ -22,9 +21,12 @@ const BusquedaTrabajo = () => {
   const [works, setWorks] = useState([]);
   const [selectedWork, setSelectedWork] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const worksPerPage = 10;
+  const totalPages = Math.ceil(works.length / worksPerPage);
 
-  const [mechanicDetails, setMechanicDetails] = useState({});
-  const [clientDetails, setClientDetails] = useState({});
+  const [editedWork, setEditedWork] = useState(null);
+
 
   const searchOptions = {
     matricula: 'Matricula',
@@ -34,50 +36,10 @@ const BusquedaTrabajo = () => {
     clientName: 'Cliente',
   };
 
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [worksResponse, mechanicsResponse, clientsResponse] = await Promise.all([
-          apiCall("works", "GET"),
-          apiCall("mechanics", "GET"),
-          apiCall("clients", "GET"),
-        ]);
-
-        if (worksResponse.ok) {
-          const workList = await worksResponse.json();
-          setWorks(workList);
-        } else {
-          console.error("Error in works response", worksResponse.statusText);
-        }
-
-        if (mechanicsResponse.ok) {
-          const mechanicsList = await mechanicsResponse.json();
-          const mechanicsDetailsMap = {};
-          mechanicsList.forEach((mechanic) => {
-            mechanicsDetailsMap[mechanic.id] = mechanic;
-          });
-          setMechanicDetails(mechanicsDetailsMap);
-        } else {
-          console.error("Error in mechanics response", mechanicsResponse.statusText);
-        }
-
-        if (clientsResponse.ok) {
-          const clientList = await clientsResponse.json();
-          const clientDetailsMap = {};
-          clientList.forEach((client) => {
-            clientDetailsMap[client.id] = client;
-          });
-          setClientDetails(clientDetailsMap);
-        } else {
-          console.error("Error in clients response", clientsResponse.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    fetchWorks()
+  }, [currentPage])
 
   const fetchWorks = async (filter) => {
     try {
@@ -102,35 +64,6 @@ const BusquedaTrabajo = () => {
     }
   };
 
-  const fetchMechanicDetails = async (mechanicId) => {
-    try {
-      const mechanicResponse = await apiCall("mechanics", "GET");
-      if (mechanicResponse.ok) {
-        const mechanicDetail = await mechanicResponse.json();
-
-        return { [mechanicId]: mechanicDetail };
-      } else {
-        console.error("Error fetching mechanic details", mechanicResponse.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching mechanic details", error);
-    }
-  };
-
-  const fetchClientDetails = async (clientId) => {
-    try {
-      const clientResponse = await apiCall("clients", "GET", null, { id: clientId });
-      if (clientResponse.ok) {
-        const clientDetail = await clientResponse.json();
-        return { [clientId]: clientDetail };
-      } else {
-        console.error("Error fetching client details", clientResponse.statusText);
-      }
-    } catch (error) {
-      console.error("Error fetching client details", error);
-    }
-  };
-
   const handleSearchSelectChange = (value) => {
 
     onInputChange({ target: { name: "searchSelect", value } });
@@ -146,22 +79,65 @@ const BusquedaTrabajo = () => {
       formattedDate = formatISO(datePickerValue);
     }
 
-    await fetchWorks({ [searchSelect]: searchSelect === "createdAt" ? formattedDate : search });
+    const filter = { [searchSelect]: searchSelect === "createdAt" ? formattedDate : search };
 
-   /*  await fetchWorks({ [searchSelect]: search }); */
-    /* await fetchWorks({ [searchSelect]: '2024-01-31T00:00:00Z' }); */
+
+    if (searchSelect === "ci") {
+      console.log(searchSelect);
+      filter.ci = search;
+      console.log(search);
+    }
+
+    if (searchSelect === "mechanicName") {
+      console.log(searchSelect);
+      filter.userName = search;
+      console.log(search);
+    }
+
+    if (searchSelect === "clientName") {
+      console.log(searchSelect);
+      filter.name = search;
+      console.log(search);
+    }
+
+    await fetchWorks(filter);
 
   };
 
-  const handleRowClick = async (work) => {
+  const handleRowClick = (work) => {
     setSelectedWork((prevSelectedWork) => (prevSelectedWork === work ? null : work));
-
-    const fetchClientPromise = work.clientId ? fetchClientDetails(work.clientId) : Promise.resolve();
-    const fetchMechanicPromise = work.mechanicId ? fetchMechanicDetails(work.mechanicId) : Promise.resolve();
-
-    await Promise.all([fetchClientPromise, fetchMechanicPromise]);
+    setEditedWork(null);
   };
 
+  const handleEditClick = (work) => {
+    setEditedWork({ ...work, isEditing: true });
+  };
+
+
+  const handleSaveClick = async (work) => {
+    // ... (your existing save logic)
+    try {
+      const response = await apiCall(
+        `works/${work.id}`,
+        "PUT",
+        JSON.stringify(work),
+
+      );
+      if (response.ok) {
+        console.log('Work updated successfully.');
+        fetchWorks(); // Refresh the works list after successful update
+      } else {
+        console.error('Error updating work:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating work:', error.message);
+    }
+
+    setEditedWork((prevEditedFields) => ({
+      ...prevEditedFields,
+      [work.id]: { ...prevEditedFields[work.id], isEditing: false },
+    }));
+  };
 
   return (
     <div className="container">
@@ -223,31 +199,58 @@ const BusquedaTrabajo = () => {
                 </tr>
               </thead>
               <tbody>
-                {works.map((work) => (
-                  <React.Fragment key={work.id}>
-                    <tr onClick={() => handleRowClick(work)}>
-                      <td>{work.matricula}</td>
-                      <td>{`${clientDetails[work.clientId]?.name || "N/A"} ${clientDetails[work.clientId]?.lastname || "N/A"}`}</td>
-                      <td>{clientDetails[work.clientId]?.ci || "N/A"}</td>
-                      <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
-                      <td>{mechanicDetails[work.mechanicId]?.userName || "N/A"}</td>
-                    </tr>
-                    {selectedWork === work && (
-                      <tr>
-                        <td colSpan="8">
-                          <WorkDetails
-                            mechanicDetails={mechanicDetails[selectedWork.mechanicId]}
-                            clientDetails={clientDetails[selectedWork.clientId]}
-                            work={selectedWork}
-                          />
-                        </td>
+
+                {works
+                  .slice((currentPage - 1) * worksPerPage, currentPage * worksPerPage)
+                  .map((work) => (
+                    <React.Fragment key={work.id}>
+                      <tr onClick={() => handleRowClick(work)}>
+                        <td>{work.matricula}</td>
+                        <td>{`${work.client?.name || "N/A"} ${work.client?.lastname || "N/A"}`}</td>
+                        <td>{work.client?.ci || "N/A"}</td>
+                        <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
+                        <td>{work.mechanic?.userName || "N/A"}</td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                ))}
+
+
+                      {(selectedWork === work || (editedWork && editedWork.id === work.id)) && (
+                        <tr>
+                          <td colSpan="8">
+                            <WorkDetails
+                              mechanicDetails={editedWork?.mechanicDetails || work.mechanic}
+                              clientDetails={editedWork?.clientDetails || work.client}
+                              carsModelDetails={editedWork?.carsModelDetails || work.carsModel}
+                              work={editedWork || work}
+                              isEditing={editedWork?.isEditing}
+                              onEditClick={() => handleEditClick(work)}
+                              onSaveClick={() => handleSaveClick(work)}
+                            />
+
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
               </tbody>
             </table>
           </div>
+        </div>
+        <div className="text-center">
+          <button
+            className="btn btn-primary m-3"
+            onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span>Página {currentPage} de {totalPages}</span>
+          <button
+            className="btn btn-primary m-3"
+            onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
         </div>
       </div>
     </div>

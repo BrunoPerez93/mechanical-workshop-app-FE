@@ -10,9 +10,10 @@ const AddModelModal = ({
   onInputChange,
   carName,
   brands,
-  handleBrandChange, 
+  handleBrandChange,
   modelData,
-  selectedBrandId
+  selectedBrandId,
+  modelError,
 
 }) => {
   return (
@@ -45,12 +46,12 @@ const AddModelModal = ({
                     label: brand.brandName
                   }))
                   : []}
-                  value={selectedBrandId || ''}
+              value={selectedBrandId || ''}
               onChange={handleBrandChange}
               required
             />
           </div>
-
+          {modelError && <div className="error-message">{modelError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar
@@ -75,6 +76,7 @@ AddModelModal.propTypes = {
   brands: PropTypes.array.isRequired,
   selectedBrandId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   modelData: PropTypes.object,
+  modelError: PropTypes.string,
 };
 
 export default AddModelModal;

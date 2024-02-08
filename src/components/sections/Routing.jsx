@@ -15,6 +15,7 @@ const Routing = () => {
 
   return (
     <Routes>
+
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route path='/' element={<WithNav value={<BusquedaTrabajo />} />} />
@@ -23,6 +24,7 @@ const Routing = () => {
         <Route path='/admin-tecnico' element={<WithNav value={validateAdminRole(state.user?.role) ? <AdministrarTecnico /> : <Navigate to="/login" />} />} />
         <Route path="/*" element={<WithNav value={<BusquedaTrabajo />} />} />
       </Route>
+
     </Routes>
   )
 }
