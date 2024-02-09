@@ -115,7 +115,7 @@ const BusquedaTrabajo = () => {
 
 
   const handleSaveClick = async (work) => {
-    // ... (your existing save logic)
+
     try {
       const response = await apiCall(
         `works/${work.id}`,
@@ -125,7 +125,7 @@ const BusquedaTrabajo = () => {
       );
       if (response.ok) {
         console.log('Work updated successfully.');
-        fetchWorks(); // Refresh the works list after successful update
+        fetchWorks();
       } else {
         console.error('Error updating work:', response.statusText);
       }
@@ -224,6 +224,7 @@ const BusquedaTrabajo = () => {
                               isEditing={editedWork?.isEditing}
                               onEditClick={() => handleEditClick(work)}
                               onSaveClick={() => handleSaveClick(work)}
+                              handleSaveClick={handleSaveClick}
                             />
 
                           </td>

@@ -13,13 +13,17 @@ export const WorkDetails = ({
   isEditing,
   onEditClick,
   onSaveClick,
+  handleSaveClick,
 }) => {
 
   const [mechanicsData, setMechanicsData] = useState([]);
   const [clientsData, setClientsData] = useState([]);
   const [carsModelsData, setCarsModelsData] = useState([]);
+  const [brandsData, setBrandsData] = useState([]);
+
   const [editedFields, setEditedFields] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [total, setTotal] = useState(work.total || 0);
 
   const { state } = useAuth();
 
@@ -81,15 +85,25 @@ export const WorkDetails = ({
     setEditedFields((prevEditedFields) => {
       const updatedFields = { ...prevEditedFields };
       updatedFields[fieldName] = value;
+
+      if (fieldName === 'handWork' || fieldName === 'priceAutoParts') {
+        const handWork = parseFloat(updatedFields['handWork']) || parseFloat(work.handWork) || 0;
+        const priceAutoParts = parseFloat(updatedFields['priceAutoParts']) || parseFloat(work.priceAutoParts) || 0;
+        const newTotal = handWork + priceAutoParts;
+        setTotal(newTotal);
+        updatedFields['total'] = newTotal;
+      }
       return updatedFields;
     });
   };
 
-  const handleSaveClick = () => {
+  handleSaveClick = () => {
     const updatedWork = {
       ...work,
       ...editedFields,
     };
+
+    console.log('Before onSaveClick:', updatedWork);
     onSaveClick(updatedWork);
   };
 
@@ -99,14 +113,28 @@ export const WorkDetails = ({
         const mechanicsResponse = await apiCall("mechanics", "GET");
         const clientsResponse = await apiCall("clients", "GET");
         const carsModelsResponse = await apiCall("carsModels", "GET");
+        const brandsResponse = await apiCall("brands", "GET");
+
 
         const mechanicsList = await mechanicsResponse.json();
         const clientsList = await clientsResponse.json();
         const carsModelsList = await carsModelsResponse.json();
+        const brandsList = await brandsResponse.json();
 
         setMechanicsData(mechanicsList);
         setClientsData(clientsList);
         setCarsModelsData(carsModelsList);
+        setBrandsData(brandsList);
+
+        const initialEditedFields = {
+          ...work,
+          mechanic: mechanicDetails || "",
+          client: clientDetails || "",
+          carsModel: carsModelDetails || "",
+       
+        };
+
+        setEditedFields(initialEditedFields);
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -114,7 +142,7 @@ export const WorkDetails = ({
       setIsLoading(false);
     };
     fetchWorks();
-  }, []);
+  }, [work, carsModelDetails, clientDetails, mechanicDetails,]);
 
 
   if (isLoading) {
@@ -142,44 +170,45 @@ export const WorkDetails = ({
                 }
 
                 const label = fieldLabels[fieldName] || fieldName;
-
-                if (work[fieldName] && typeof work[fieldName] === 'object') {
-                  if (fieldName === 'mechanicDetails') {
-                    return (
-                      <div key={fieldName} className="form-group col-sm-12 col-md-12">
-                        <label>Mecanico:</label>
-                        <select
-                          className="form-control"
-                          value={editedFields[fieldName]?.id || ""}
-                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
-                        >
-                          {mechanicsData.map((mechanic) => (
-                            <option key={mechanic.id} value={mechanic.id}>
-                              {mechanic.userName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  } if (work[fieldName] && typeof work[fieldName] === 'object') {
-                    return (
-                      <div key={fieldName} className="form-group col-sm-12 col-md-12">
-                        <label>Cliente:</label>
-                        <select
-                          className="form-control"
-                          value={editedFields[fieldName]?.id || ""}
-                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
-                        >
-                          {clientsData.map((client) => (
-                            <option key={client.id} value={client.id}>
-                              {client.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  } if (work[fieldName] && typeof work[fieldName] === 'object') {
-                    return (
+                if (fieldName === 'mechanic' && work[fieldName] && typeof work[fieldName] === 'object') {
+                  return (
+                    <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                      <label>Mecanico:</label>
+                      <select
+                        className="form-control"
+                        value={editedFields[fieldName]?.id || ""}
+                        onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
+                      >
+                        {mechanicsData.map((mechanic) => (
+                          <option key={mechanic.id} value={mechanic.id}>
+                            {mechanic.userName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                }
+                if (fieldName === 'client' && work[fieldName] && typeof work[fieldName] === 'object') {
+                  return (
+                    <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                      <label>Cliente:</label>
+                      <select
+                        className="form-control"
+                        value={editedFields[fieldName]?.id || ""}
+                        onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
+                      >
+                        {clientsData.map((client) => (
+                          <option key={client.id} value={client.id}>
+                            {client.name} {client.lastname}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                }
+                if (fieldName === 'carsModel' && work[fieldName] && typeof work[fieldName] === 'object') {
+                  return (
+                    <>
                       <div key={fieldName} className="form-group col-sm-12 col-md-12">
                         <label>Marca:</label>
                         <select
@@ -187,16 +216,31 @@ export const WorkDetails = ({
                           value={editedFields[fieldName]?.id || ""}
                           onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
                         >
-                          {carsModelsData.map((carModel) => (
-                            <option key={carModel.id} value={carModel.id}>
-                              {carModel.brand.brandName}
+                          {brandsData.map((brand) => (
+                            <option key={brand.id} value={brand.id}>
+                              {work.carsModel.brand.brandName}
                             </option>
                           ))}
                         </select>
                       </div>
-                    );
-                  }
+                      <div key={`${fieldName}-model`} className="form-group col-sm-12 col-md-12">
+                        <label>Modelo:</label>
+                        <select
+                          className="form-control"
+                          value={editedFields[fieldName]?.id || ""}
+                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
+                        >
+                          {carsModelsData.map((carModel) => (
+                            <option key={carModel.id} value={carModel.id}>
+                              {carModel.carName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  );
                 }
+
 
                 if (typeof work[fieldName] === "boolean") {
                   return (
@@ -256,7 +300,7 @@ export const WorkDetails = ({
             </>
           )}
 
-          <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {work.total}</p>
+          <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {total}</p>
           <p> <span style={{ fontWeight: 'bold' }}>ABS:</span> {displayStatus(work.abs)}</p>
           <p> <span style={{ fontWeight: 'bold' }}>Motor:</span> {displayStatus(work.engine)}</p>
           <p> <span style={{ fontWeight: 'bold' }}>Airbag:</span> {displayStatus(work.airbag)}</p>
@@ -296,4 +340,5 @@ WorkDetails.propTypes = {
   isEditing: PropTypes.bool,
   onEditClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
+  handleSaveClick: PropTypes.func.isRequired,
 };
