@@ -16,6 +16,7 @@ export const WorkDetails = ({
   handleSaveClick,
 }) => {
 
+
   const [mechanicsData, setMechanicsData] = useState([]);
   const [clientsData, setClientsData] = useState([]);
   const [carsModelsData, setCarsModelsData] = useState([]);
@@ -126,13 +127,16 @@ export const WorkDetails = ({
         setCarsModelsData(carsModelsList);
         setBrandsData(brandsList);
 
+        const initialBrandId = work.carsModel?.brand?.id || '';
+
         const initialEditedFields = {
           ...work,
           mechanic: mechanicDetails || "",
           client: clientDetails || "",
           carsModel: carsModelDetails || "",
-       
+          brand: initialBrandId,
         };
+
 
         setEditedFields(initialEditedFields);
 
@@ -172,10 +176,10 @@ export const WorkDetails = ({
                 const label = fieldLabels[fieldName] || fieldName;
                 if (fieldName === 'mechanic' && work[fieldName] && typeof work[fieldName] === 'object') {
                   return (
-                    <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                    <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                       <label>Mecanico:</label>
                       <select
-                        className="form-control"
+                        className="form-select"
                         value={editedFields[fieldName]?.id || ""}
                         onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
                       >
@@ -190,10 +194,10 @@ export const WorkDetails = ({
                 }
                 if (fieldName === 'client' && work[fieldName] && typeof work[fieldName] === 'object') {
                   return (
-                    <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                    <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                       <label>Cliente:</label>
                       <select
-                        className="form-control"
+                        className="form-select"
                         value={editedFields[fieldName]?.id || ""}
                         onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
                       >
@@ -209,24 +213,24 @@ export const WorkDetails = ({
                 if (fieldName === 'carsModel' && work[fieldName] && typeof work[fieldName] === 'object') {
                   return (
                     <>
-                      <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                      <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                         <label>Marca:</label>
                         <select
-                          className="form-control"
-                          value={editedFields[fieldName]?.id || ""}
-                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
+                          className="form-select"
+                          value={editedFields[fieldName]?.brand?.id || ""}
+                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], brand: { id: e.target.value } })}
                         >
                           {brandsData.map((brand) => (
                             <option key={brand.id} value={brand.id}>
-                              {work.carsModel.brand.brandName}
+                              {brand.brandName}
                             </option>
                           ))}
                         </select>
                       </div>
-                      <div key={`${fieldName}-model`} className="form-group col-sm-12 col-md-12">
+                      <div key={`${fieldName}-model`} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                         <label>Modelo:</label>
                         <select
-                          className="form-control"
+                          className="form-select"
                           value={editedFields[fieldName]?.id || ""}
                           onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
                         >
@@ -244,7 +248,7 @@ export const WorkDetails = ({
 
                 if (typeof work[fieldName] === "boolean") {
                   return (
-                    <div key={fieldName} className="form-group">
+                    <div key={fieldName} className="form-group mt-2 mb-2">
                       <label>
                         {label}
                         <input
@@ -260,7 +264,7 @@ export const WorkDetails = ({
 
                 return (
 
-                  <div key={fieldName} className="form-group col-sm-12 col-md-12">
+                  <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                     <label>{label}</label>
                     <input
                       type="text"
