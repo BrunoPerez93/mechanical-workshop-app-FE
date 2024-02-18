@@ -268,7 +268,6 @@ const DetalleTrabajo = () => {
 
       if (response.ok) {
         fetchClients();
-        resetForm();
       } else {
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
@@ -497,8 +496,11 @@ const DetalleTrabajo = () => {
     if (!validateForm()) {
       return;
     }
+
+    const { ci, name, lastname, ...cleanedFormState } = formState;
+
     const updatedFormState = {
-      ...formState,
+      ...cleanedFormState,
       ...checkboxData,
       km: parseFloat(formState.km),
       cel: parseFloat(formState.cel),

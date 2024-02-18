@@ -63,7 +63,7 @@ const WorkForm = ({
             <h2>Marca</h2>
             <SelectComponent
               options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
-              value={brands.id}
+              value={brands.brandId}
               onChange={handleBrandChange}
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
@@ -76,7 +76,7 @@ const WorkForm = ({
               options={models.map((model) => ({ value: model.id, label: model.carName }))}
               value={formState.carModelId}
               onChange={handleModelChange}
-              required
+
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarModel}>Agregar</button>
           </div>
@@ -90,7 +90,7 @@ const WorkForm = ({
               value={matricula}
               placeholder="matricula"
               onChange={onInputChange}
-              required
+
             />
           </div>
 

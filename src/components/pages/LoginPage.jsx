@@ -56,6 +56,8 @@ const LoginPage = () => {
         onInputChange({ target: { name: 'password', value: '' } });
         localStorage.setItem('token', token);
 
+        console.log('token', token);
+
         setTimeout(() => {
           navigate('/');
         }, 100);
@@ -68,7 +70,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error("Error during login:", error);
-      setError("An error occurred during login. Please try again.");
+      setError("Ocurrio un error. Contacte con el administrador.");
     }
   };
 

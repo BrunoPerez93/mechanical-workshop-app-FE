@@ -2,8 +2,9 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import checkMark from '../../assets/check-mark.png'
 import crossMark from '../../assets/cross-mark.png'
-import { apiCall, validateAdminRole } from "../../utility/common";
+import { validateAdminRole } from "../../utility/common";
 import { useAuth } from "../Context/AuthContext";
+import InputComponent from "../InputComponent";
 
 export const WorkDetails = ({
   mechanicDetails,
@@ -13,18 +14,14 @@ export const WorkDetails = ({
   isEditing,
   onEditClick,
   onSaveClick,
-  handleSaveClick,
+  onFieldChange,
 }) => {
 
 
-  const [mechanicsData, setMechanicsData] = useState([]);
-  const [clientsData, setClientsData] = useState([]);
-  const [carsModelsData, setCarsModelsData] = useState([]);
-  const [brandsData, setBrandsData] = useState([]);
 
   const [editedFields, setEditedFields] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [total, setTotal] = useState(work.total || 0);
+
 
   const { state } = useAuth();
 
@@ -47,7 +44,6 @@ export const WorkDetails = ({
     priceAutoParts: 'Precio Repuestos',
     total: 'Total Presupuesto',
   }
-
 
   const displayStatus = (value) => (value
     ? <img src={checkMark} alt="Check Mark" style={{ width: '15px', height: '15px', marginLeft: '10px' }} />
@@ -82,72 +78,27 @@ export const WorkDetails = ({
     marginLeft: "10px"
   });
 
-  const handleFieldChange = (fieldName, value) => {
-    setEditedFields((prevEditedFields) => {
-      const updatedFields = { ...prevEditedFields };
-      updatedFields[fieldName] = value;
-
-      if (fieldName === 'handWork' || fieldName === 'priceAutoParts') {
-        const handWork = parseFloat(updatedFields['handWork']) || parseFloat(work.handWork) || 0;
-        const priceAutoParts = parseFloat(updatedFields['priceAutoParts']) || parseFloat(work.priceAutoParts) || 0;
-        const newTotal = handWork + priceAutoParts;
-        setTotal(newTotal);
-        updatedFields['total'] = newTotal;
-      }
-      return updatedFields;
-    });
-  };
-
-  handleSaveClick = () => {
-    const updatedWork = {
-      ...work,
-      ...editedFields,
-    };
-
-    console.log('Before onSaveClick:', updatedWork);
-    onSaveClick(updatedWork);
-  };
 
   useEffect(() => {
     const fetchWorks = async () => {
       try {
-        const mechanicsResponse = await apiCall("mechanics", "GET");
-        const clientsResponse = await apiCall("clients", "GET");
-        const carsModelsResponse = await apiCall("carsModels", "GET");
-        const brandsResponse = await apiCall("brands", "GET");
-
-
-        const mechanicsList = await mechanicsResponse.json();
-        const clientsList = await clientsResponse.json();
-        const carsModelsList = await carsModelsResponse.json();
-        const brandsList = await brandsResponse.json();
-
-        setMechanicsData(mechanicsList);
-        setClientsData(clientsList);
-        setCarsModelsData(carsModelsList);
-        setBrandsData(brandsList);
-
-        const initialBrandId = work.carsModel?.brand?.id || '';
-
-        const initialEditedFields = {
+        const editedFieldsData = {
           ...work,
-          mechanic: mechanicDetails || "",
-          client: clientDetails || "",
-          carsModel: carsModelDetails || "",
-          brand: initialBrandId,
+          mechanic: work.mechanicId ? work.mechanicId.userName || "" : "",
+          client: work.clientId ? work.clientId.name || "" : "",
+          carsModel: work.carsModelId ? work.carsModelId.carName || "" : "",
+          brand: work.carsModel && work.carsModel.brand ? work.carsModel.brand.brandName || "" : ""
         };
 
-
-        setEditedFields(initialEditedFields);
-
+        setEditedFields(editedFieldsData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
       setIsLoading(false);
+
     };
     fetchWorks();
-  }, [work, carsModelDetails, clientDetails, mechanicDetails,]);
-
+  }, [work]);
 
   if (isLoading) {
     return <p>Loaging...</p>
@@ -158,7 +109,7 @@ export const WorkDetails = ({
       {isEditing && (
         <div className="container ">
           <div className="row ">
-            <form onSubmit={handleSaveClick} className="m-2">
+            <form onSubmit={onSaveClick} className="m-2">
               {Object.keys(work).map((fieldName) => {
                 if (
                   [
@@ -168,83 +119,15 @@ export const WorkDetails = ({
                     "clientId",
                     "createdAt",
                     "isEditing",
+                    "mechanic",
+                    "carsModel",
+                    "client"
                   ].includes(fieldName)
                 ) {
                   return null;
                 }
 
                 const label = fieldLabels[fieldName] || fieldName;
-                if (fieldName === 'mechanic' && work[fieldName] && typeof work[fieldName] === 'object') {
-                  return (
-                    <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                      <label>Mecanico:</label>
-                      <select
-                        className="form-select"
-                        value={editedFields[fieldName]?.id || ""}
-                        onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
-                      >
-                        {mechanicsData.map((mechanic) => (
-                          <option key={mechanic.id} value={mechanic.id}>
-                            {mechanic.userName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
-                }
-                if (fieldName === 'client' && work[fieldName] && typeof work[fieldName] === 'object') {
-                  return (
-                    <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                      <label>Cliente:</label>
-                      <select
-                        className="form-select"
-                        value={editedFields[fieldName]?.id || ""}
-                        onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
-                      >
-                        {clientsData.map((client) => (
-                          <option key={client.id} value={client.id}>
-                            {client.name} {client.lastname}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
-                }
-                if (fieldName === 'carsModel' && work[fieldName] && typeof work[fieldName] === 'object') {
-                  return (
-                    <>
-                      <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                        <label>Marca:</label>
-                        <select
-                          className="form-select"
-                          value={editedFields[fieldName]?.brand?.id || ""}
-                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], brand: { id: e.target.value } })}
-                        >
-                          {brandsData.map((brand) => (
-                            <option key={brand.id} value={brand.id}>
-                              {brand.brandName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div key={`${fieldName}-model`} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                        <label>Modelo:</label>
-                        <select
-                          className="form-select"
-                          value={editedFields[fieldName]?.id || ""}
-                          onChange={(e) => handleFieldChange(fieldName, { ...work[fieldName], id: e.target.value })}
-                        >
-                          {carsModelsData.map((carModel) => (
-                            <option key={carModel.id} value={carModel.id}>
-                              {carModel.carName}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </>
-                  );
-                }
-
 
                 if (typeof work[fieldName] === "boolean") {
                   return (
@@ -255,7 +138,7 @@ export const WorkDetails = ({
                           className="form-check-input m-2 "
                           type="checkbox"
                           checked={editedFields[fieldName] !== undefined ? editedFields[fieldName] : work[fieldName]}
-                          onChange={(e) => handleFieldChange(fieldName, e.target.checked)}
+                          onChange={(e) => onFieldChange(fieldName, e.target.checked)}
                         />
                       </label>
                     </div>
@@ -266,11 +149,11 @@ export const WorkDetails = ({
 
                   <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                     <label>{label}</label>
-                    <input
+                    <InputComponent
                       type="text"
                       className="form-control"
                       value={editedFields[fieldName] ?? work[fieldName]}
-                      onChange={(e) => handleFieldChange(fieldName, e.target.value)}
+                      onChange={(e) => onFieldChange(fieldName, e.target.value)}
                     />
                   </div>
 
@@ -281,58 +164,62 @@ export const WorkDetails = ({
               </button>
             </form>
           </div>
-        </div>
+        </div >
       )}
-      {!isEditing && (
-        <div>
-          <p> <span style={{ fontWeight: 'bold' }}>Matricula:</span> {work.matricula}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Nombre Cliente:</span> {`${clientDetails.name} ${clientDetails.lastname}`}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Celular: </span>{work.cel}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Ci:</span> {clientDetails.ci}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Marca:</span> {carsModelDetails.brand.brandName}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Modelo:</span> {carsModelDetails.carName}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>KM:</span> {work.km}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Reclamo: </span>{work.reclame}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Repuestos:</span> {work.autoParts}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Observaciones: </span>{work.observations}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Nombre del Técnico:</span> {mechanicDetails.userName}</p>
+      {
+        !isEditing && (
+          <div>
+            <p> <span style={{ fontWeight: 'bold' }}>Matricula:</span> {work.matricula}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Nombre Cliente:</span> {`${clientDetails.name} ${clientDetails.lastname}`}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Celular: </span>{work.cel}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Ci:</span> {clientDetails.ci}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Marca:</span> {carsModelDetails.brand.brandName}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Modelo:</span> {carsModelDetails.carName}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>KM:</span> {work.km}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Reclamo: </span>{work.reclame}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Repuestos:</span> {work.autoParts}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Observaciones: </span>{work.observations}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Nombre del Técnico:</span> {mechanicDetails.userName}</p>
 
-          {validateAdminRole(state.user?.role) && (
-            <>
-              <p> <span style={{ fontWeight: 'bold' }}>Mano de obra: </span>$ {work.handWork}</p>
-              <p > <span style={{ fontWeight: 'bold' }}>Precio de repuesto: </span>$ {work.priceAutoParts}</p>
-            </>
-          )}
+            {validateAdminRole(state.user?.role) && (
+              <>
+                <p> <span style={{ fontWeight: 'bold' }}>Mano de obra: </span>$ {work.handWork}</p>
+                <p > <span style={{ fontWeight: 'bold' }}>Precio de repuesto: </span>$ {work.priceAutoParts}</p>
+              </>
+            )}
 
-          <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {total}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>ABS:</span> {displayStatus(work.abs)}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Motor:</span> {displayStatus(work.engine)}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Airbag:</span> {displayStatus(work.airbag)}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Direccion:</span> {displayStatus(work.steer)}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Ta: </span>{displayStatus(work.ta)}</p>
-          <p> <span style={{ fontWeight: 'bold' }}>Buen Pagador: </span>
-            {displayStatusPayers(work.goodPayer)}
-            <span style={getStatusStyleGood(work.goodPayer)}></span>
-          </p>
-          <p> <span style={{ fontWeight: 'bold' }}>Mal Pagador:</span>
-            {displayStatusPayers(work.badPayer)}
-            <span style={getStatusStyleBad(work.badPayer)}></span>
-          </p>
-          <p> <span style={{ fontWeight: 'bold' }}>Pagador Normal:</span>
-            {displayStatusPayers(work.normalPayer)}
-            <span style={getStatusStyleNormal(work.normalPayer)}></span>
-          </p>
-        </div>
+            <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {work.total || 0}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>ABS:</span> {displayStatus(work.abs)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Motor:</span> {displayStatus(work.engine)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Airbag:</span> {displayStatus(work.airbag)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Direccion:</span> {displayStatus(work.steer)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Ta: </span>{displayStatus(work.ta)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Buen Pagador: </span>
+              {displayStatusPayers(work.goodPayer)}
+              <span style={getStatusStyleGood(work.goodPayer)}></span>
+            </p>
+            <p> <span style={{ fontWeight: 'bold' }}>Mal Pagador:</span>
+              {displayStatusPayers(work.badPayer)}
+              <span style={getStatusStyleBad(work.badPayer)}></span>
+            </p>
+            <p> <span style={{ fontWeight: 'bold' }}>Pagador Normal:</span>
+              {displayStatusPayers(work.normalPayer)}
+              <span style={getStatusStyleNormal(work.normalPayer)}></span>
+            </p>
+          </div>
 
-      )}
+        )
+      }
 
-      {!isEditing && validateAdminRole(state.user?.role) && (
+      {
+        !isEditing && validateAdminRole(state.user?.role) && (
 
-        <button className="btn btn-primary" onClick={onEditClick}>
-          Edit
-        </button>
-      )}
-    </div>
+          <button className="btn btn-primary" onClick={onEditClick}>
+            Edit
+          </button>
+        )
+      }
+    </div >
   );
 };
 
@@ -344,5 +231,5 @@ WorkDetails.propTypes = {
   isEditing: PropTypes.bool,
   onEditClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
-  handleSaveClick: PropTypes.func.isRequired,
+  onFieldChange: PropTypes.func.isRequired,
 };

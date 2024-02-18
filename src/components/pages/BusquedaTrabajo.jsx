@@ -6,9 +6,12 @@ import { WorkDetails } from "../Work/WorkDetails";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, formatISO } from 'date-fns';
+import { useAuth } from "../Context/AuthContext";
 
 
 const BusquedaTrabajo = () => {
+
+  const { state } = useAuth();
 
   const { formState, onInputChange } = useForm({
     searchSelect: '',
@@ -36,31 +39,67 @@ const BusquedaTrabajo = () => {
     clientName: 'Cliente',
   };
 
+  const handleSaveClick = async () => {
+    try {
+      console.log('User State:', state.user);
+      const { ...workData } = editedWork;
+      console.log('Work Data:', workData);
+
+      setEditedWork((prevEditedWork) => {
+        const updatedWork = { ...prevEditedWork };
+        return updatedWork;
+      });
+
+      const token = localStorage.getItem('token');
+      console.log('Token:', token);
+
+      const response = await apiCall(
+        `works/${editedWork.id}`,
+        'PUT',
+        JSON.stringify(workData),
+        { Authorization: `Bearer ${token}` }
+      );
+
+      if (response.ok) {
+        // Corrected token retrieval
+        console.log('Token:', token);
+
+        console.log('response:', response);
+        console.log('Work saved successfully');
+        setEditedWork(null);
+      } else {
+        console.error('Error saving work:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error saving work:', error);
+    }
+  };
 
   useEffect(() => {
-    fetchWorks()
-  }, [currentPage])
+    if (editedWork !== null) {
+      fetchWorks();
+    }
+  }, [editedWork]);
+
 
   const fetchWorks = async (filter) => {
     try {
-      const response = await apiCall(
-        "works",
-        "GET",
-        null,
-        filter,
-      );
+      const response = await apiCall("works", "GET", null, filter);
 
       if (response.ok) {
         const workList = await response.json();
         setWorks(workList);
+
       } else {
         console.error(
-          "Error en la respuesta del servidor al pedir el listado",
+          "Error in response when fetching works:",
           response.statusText
         );
+
       }
     } catch (error) {
-      console.error("Error", error);
+      console.error("Error fetching works:", error);
+
     }
   };
 
@@ -82,24 +121,6 @@ const BusquedaTrabajo = () => {
     const filter = { [searchSelect]: searchSelect === "createdAt" ? formattedDate : search };
 
 
-    if (searchSelect === "ci") {
-      console.log(searchSelect);
-      filter.ci = search;
-      console.log(search);
-    }
-
-    if (searchSelect === "mechanicName") {
-      console.log(searchSelect);
-      filter.userName = search;
-      console.log(search);
-    }
-
-    if (searchSelect === "clientName") {
-      console.log(searchSelect);
-      filter.name = search;
-      console.log(search);
-    }
-
     await fetchWorks(filter);
 
   };
@@ -113,31 +134,20 @@ const BusquedaTrabajo = () => {
     setEditedWork({ ...work, isEditing: true });
   };
 
-
-  const handleSaveClick = async (work) => {
-
-    try {
-      const response = await apiCall(
-        `works/${work.id}`,
-        "PUT",
-        JSON.stringify(work),
-
-      );
-      if (response.ok) {
-        console.log('Work updated successfully.');
-        fetchWorks();
-      } else {
-        console.error('Error updating work:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error updating work:', error.message);
-    }
-
-    setEditedWork((prevEditedFields) => ({
-      ...prevEditedFields,
-      [work.id]: { ...prevEditedFields[work.id], isEditing: false },
+  const handleFieldChange = (fieldName, value) => {
+    console.log('Field changed:', fieldName, value);
+    setEditedWork((prevEditedWork) => ({
+      ...prevEditedWork,
+      [fieldName]: value,
     }));
   };
+
+
+  useEffect(() => {
+    fetchWorks();
+  }, [currentPage]);
+
+
 
   return (
     <div className="container">
@@ -185,10 +195,10 @@ const BusquedaTrabajo = () => {
       </div>
 
       <div className="container">
-        <div className="row">
+        <div className="row mt-4">
           <div className="text-center">
             <h2>Lista de trabajos</h2>
-            <table className="table m-3 col-6 ">
+            <table className="table table-striped m-3 col-6 ">
               <thead>
                 <tr>
                   <th>Matricula</th>
@@ -217,14 +227,15 @@ const BusquedaTrabajo = () => {
                         <tr>
                           <td colSpan="8">
                             <WorkDetails
-                              mechanicDetails={editedWork?.mechanicDetails || work.mechanic}
-                              clientDetails={editedWork?.clientDetails || work.client}
-                              carsModelDetails={editedWork?.carsModelDetails || work.carsModel}
-                              work={editedWork || work}
+                              mechanicDetails={editedWork?.mechanicDetails || selectedWork?.mechanic}
+                              clientDetails={editedWork?.clientDetails || selectedWork?.client}
+                              carsModelDetails={editedWork?.carsModelDetails || selectedWork?.carsModel}
+                              work={editedWork || selectedWork}
                               isEditing={editedWork?.isEditing}
                               onEditClick={() => handleEditClick(work)}
-                              onSaveClick={() => handleSaveClick(work)}
-                              handleSaveClick={handleSaveClick}
+                              onSaveClick={handleSaveClick}
+                              onFieldChange={(fieldName, value) => handleFieldChange(fieldName, value)}
+
                             />
 
                           </td>
