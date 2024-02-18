@@ -6,12 +6,9 @@ import { WorkDetails } from "../Work/WorkDetails";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, formatISO } from 'date-fns';
-import { useAuth } from "../Context/AuthContext";
 
 
 const BusquedaTrabajo = () => {
-
-  const { state } = useAuth();
 
   const { formState, onInputChange } = useForm({
     searchSelect: '',
@@ -23,6 +20,7 @@ const BusquedaTrabajo = () => {
 
   const [works, setWorks] = useState([]);
   const [selectedWork, setSelectedWork] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const worksPerPage = 10;
@@ -39,34 +37,30 @@ const BusquedaTrabajo = () => {
     clientName: 'Cliente',
   };
 
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (e) => {
     try {
-      console.log('User State:', state.user);
+      e.preventDefault()
       const { ...workData } = editedWork;
-      console.log('Work Data:', workData);
 
       setEditedWork((prevEditedWork) => {
         const updatedWork = { ...prevEditedWork };
         return updatedWork;
       });
 
-      const token = localStorage.getItem('token');
-      console.log('Token:', token);
-
       const response = await apiCall(
         `works/${editedWork.id}`,
         'PUT',
         JSON.stringify(workData),
-        { Authorization: `Bearer ${token}` }
       );
 
       if (response.ok) {
-        // Corrected token retrieval
-        console.log('Token:', token);
+        console.log('Work updated');
+        setEditedWork()
+        setUpdateMessage('Trabajo Modificado')
+        setTimeout(() => {
+          setUpdateMessage('')
+        }, 5000)
 
-        console.log('response:', response);
-        console.log('Work saved successfully');
-        setEditedWork(null);
       } else {
         console.error('Error saving work:', response.status, response.statusText);
       }
@@ -135,7 +129,6 @@ const BusquedaTrabajo = () => {
   };
 
   const handleFieldChange = (fieldName, value) => {
-    console.log('Field changed:', fieldName, value);
     setEditedWork((prevEditedWork) => ({
       ...prevEditedWork,
       [fieldName]: value,
@@ -198,6 +191,7 @@ const BusquedaTrabajo = () => {
         <div className="row mt-4">
           <div className="text-center">
             <h2>Lista de trabajos</h2>
+            {updateMessage && <div className="alert alert-success">{updateMessage}</div>}
             <table className="table table-striped m-3 col-6 ">
               <thead>
                 <tr>

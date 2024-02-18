@@ -9,14 +9,9 @@ const Navigation = () => {
   const [expanded, setExpanded] = useState(false);
   const { state } = useAuth();
 
-  console.log('User Role:', state.user?.role);
-
   const handleLinkClick = () => {
     setExpanded(false);
   };
-
-console.log('Is Admin:', validateAdminRole(state.user?.role));
-console.log('Is Managment:', validateManagementMinimumRole(state.user?.role));
 
   return (
     <Navbar bg="light" expand="lg" className="ps-3 ">

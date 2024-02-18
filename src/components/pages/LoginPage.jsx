@@ -31,6 +31,9 @@ const LoginPage = () => {
 
     if (!formState.username || !formState.password) {
       setError("Usuario y contraseña son requeridos.");
+      setTimeout(() => {
+        setError('')
+      }, 3000)
       return
     }
 
@@ -56,8 +59,6 @@ const LoginPage = () => {
         onInputChange({ target: { name: 'password', value: '' } });
         localStorage.setItem('token', token);
 
-        console.log('token', token);
-
         setTimeout(() => {
           navigate('/');
         }, 100);
@@ -65,8 +66,14 @@ const LoginPage = () => {
       } else {
         const errorResponse = await response.json();
         console.error("Login failed:", errorResponse.message);
-
-        setError(errorResponse.message);
+        if (response.status === 400) {
+          setError("Usuario o contraseña incorrectos.");
+          setTimeout(() => {
+            setError('')
+          }, 3000)
+        } else {
+          setError(errorResponse.message);
+        }
       }
     } catch (error) {
       console.error("Error during login:", error);
