@@ -49,6 +49,20 @@ const WorkForm = ({
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
 
+  const sortedBrands = brands.length > 0
+    ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })).sort((a, b) => a.label.localeCompare(b.label))
+    : [];
+
+  const sortedModels = models.map((model) => ({ value: model.id, label: model.carName })).sort((a, b) => a.label.localeCompare(b.label));
+
+  const sortedClients = clients.map((client) => ({
+    value: client.id,
+    label: `${client.name} ${client.lastname} ${client.ci}`
+  })).sort((a, b) => a.label.localeCompare(b.label));
+
+  const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));
+
+
   return (
     <form onSubmit={handleTrabajoSubmit}>
       <div className="title">
@@ -62,7 +76,7 @@ const WorkForm = ({
           <div className="col-xs-6 col-md-6 d-flex required required">
             <h2>Marca</h2>
             <SelectComponent
-              options={brands.length > 0 ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })) : []}
+              options={sortedBrands}
               value={brands.brandId}
               onChange={handleBrandChange}
             />
@@ -73,7 +87,7 @@ const WorkForm = ({
           <div className="col-xs-6 col-md-6 d-flex">
             <h2>Modelo</h2>
             <SelectComponent
-              options={models.map((model) => ({ value: model.id, label: model.carName }))}
+              options={sortedModels}
               value={formState.carModelId}
               onChange={handleModelChange}
 
@@ -111,7 +125,7 @@ const WorkForm = ({
           <div className="d-flex col-xs-6 col-md-6">
             <h2>Cliente</h2>
             <SelectComponent
-              options={clients.map((client) => ({ value: client.id, label: `${client.name} ${client.lastname} ${client.ci}` }))}
+              options={sortedClients}
               value={clients.id}
               onChange={handleClientChange}
               required
@@ -179,7 +193,7 @@ const WorkForm = ({
           {/* MECANICOS */}
           <h2>Técnico</h2>
           <SelectComponent
-            options={mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName }))}
+            options={sortedMechanics}
             value={mechanics.id}
             onChange={handleMechanicChange}
             required
