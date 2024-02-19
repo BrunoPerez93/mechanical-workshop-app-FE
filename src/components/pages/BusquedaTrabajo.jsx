@@ -24,7 +24,7 @@ const BusquedaTrabajo = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const worksPerPage = 10;
-  const totalPages = Math.ceil(works.length / worksPerPage);
+  const totalPages = works.length > 0 ? Math.ceil(works.length / worksPerPage) : 0;
 
   const [editedWork, setEditedWork] = useState(null);
 
@@ -244,15 +244,15 @@ const BusquedaTrabajo = () => {
           <button
             className="btn btn-primary m-3"
             onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
-            disabled={currentPage === 1}
+            disabled={currentPage === 1 || totalPages === 0}
           >
             Anterior
           </button>
-          <span>Página {currentPage} de {totalPages}</span>
+          <span>Página {totalPages > 0 ? currentPage : 0} de {totalPages}</span>
           <button
             className="btn btn-primary m-3"
             onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             Siguiente
           </button>
