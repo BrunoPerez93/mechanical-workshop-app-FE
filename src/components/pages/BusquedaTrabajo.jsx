@@ -54,7 +54,6 @@ const BusquedaTrabajo = () => {
       );
 
       if (response.ok) {
-        console.log('Work updated');
         setEditedWork()
         setUpdateMessage('Trabajo Modificado')
         setTimeout(() => {

@@ -2,7 +2,6 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export const logout = () => {
   localStorage.removeItem('token');
-  console.log('borro localstorate');
 };
 
 export const apiCall = async (path, method, body, queryParams, isWithoutToken) => {
