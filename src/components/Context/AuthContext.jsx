@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useEffect, useReducer } from 'react';
 import PropTypes from "prop-types";
 
 const AuthContext = createContext();
@@ -17,7 +17,12 @@ const authReducer = (state, action) => {
 };
 
 const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const storedState = JSON.parse(localStorage.getItem('authState')) || initialState; 
+  const [state, dispatch] = useReducer(authReducer, storedState);
+
+  useEffect(() => {
+    localStorage.setItem('authState', JSON.stringify(state));
+  }, [state]);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
