@@ -99,7 +99,6 @@ const LoginPage = () => {
             name="username"
             value={username}
             onChange={onInputChange}
-            autoComplete="username"
           />
 
           <h2>Password</h2>
@@ -111,7 +110,6 @@ const LoginPage = () => {
             name="password"
             value={password}
             onChange={onInputChange}
-            autoComplete="current-password"
           />
 
           <button className="btn btn-primary mt-2 col-2" type="submit" >Login</button>

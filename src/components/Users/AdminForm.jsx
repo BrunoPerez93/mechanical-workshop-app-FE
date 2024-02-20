@@ -25,7 +25,6 @@ export const AdminForm = ({ formState, onInputChange, handleSubmit }) => {
             name="userName"
             value={userName}
             onChange={onInputChange}
-            autoComplete="userName"
             required
           />
 
@@ -37,7 +36,6 @@ export const AdminForm = ({ formState, onInputChange, handleSubmit }) => {
             name="password"
             value={password}
             onChange={onInputChange}
-            autoComplete="current-password"
             required
           />
 

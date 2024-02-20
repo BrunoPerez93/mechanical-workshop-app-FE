@@ -191,7 +191,7 @@ const BusquedaTrabajo = () => {
           <div className="text-center">
             <h2>Lista de trabajos</h2>
             {updateMessage && <div className="alert alert-success">{updateMessage}</div>}
-            <table className="table table-striped m-3 col-6 ">
+            <table className="table table-striped m-3">
               <thead>
                 <tr>
                   <th>Matricula</th>
@@ -240,22 +240,26 @@ const BusquedaTrabajo = () => {
             </table>
           </div>
         </div>
-        <div className="text-center">
-          <button
-            className="btn btn-primary m-3"
-            onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
-            disabled={currentPage === 1 || totalPages === 0}
-          >
-            Anterior
-          </button>
-          <span>Página {totalPages > 0 ? currentPage : 0} de {totalPages}</span>
-          <button
-            className="btn btn-primary m-3"
-            onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
-            disabled={currentPage === totalPages || totalPages === 0}
-          >
-            Siguiente
-          </button>
+        <div className="container">
+          <div className="row text-center">
+            <div className="d-flex justify-content-center align-items-center">
+              <button
+                className="btn btn-primary m-3"
+                onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
+                disabled={currentPage === 1 || totalPages === 0}
+              >
+                Anterior
+              </button>
+              <span>Página {totalPages > 0 ? currentPage : 0} de {totalPages}</span>
+              <button
+                className="btn btn-primary m-3"
+                onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

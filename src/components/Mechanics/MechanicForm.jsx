@@ -16,7 +16,6 @@ export const MechanicForm = ({ formState, onInputChange, handleSubmit }) => {
         name="userName"
         value={userName}
         onChange={onInputChange}
-        autoComplete="userName"
         required
       />
 

@@ -256,6 +256,9 @@ const DetalleTrabajo = () => {
 
     if (existingClient) {
       setCiError('Cedula ya ingresada');
+      setTimeout(() => {
+        setCiError('')
+      }, 5000)
       return
     }
 
@@ -319,6 +322,9 @@ const DetalleTrabajo = () => {
 
     if (existingBrand) {
       setBrandError('Marca ya ingresada')
+      setTimeout(() =>{
+        setBrandError('')
+      }, 5000)
       return
     }
 
@@ -384,6 +390,9 @@ const DetalleTrabajo = () => {
 
     if (existingModel) {
       setModelError(`El modelo ya está ingresado`);
+      setTimeout(() => {
+        setModelError('')
+      }, 5000)
       return;
     }
 
