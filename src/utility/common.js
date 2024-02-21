@@ -9,7 +9,7 @@ export const apiCall = async (path, method, body, queryParams, isWithoutToken) =
   if (queryParams)
     Object.keys(queryParams).forEach(key => url.searchParams.append(key, queryParams[key]));
 
-  return fetch(
+  const response = await fetch(
     url,
     {
       method,
@@ -19,7 +19,12 @@ export const apiCall = async (path, method, body, queryParams, isWithoutToken) =
         ...(!isWithoutToken && { "Authorization": `Bearer ${localStorage.getItem('token')}` })
       },
     }
-  )
+  );
+  if (response.status === 401) {
+    localStorage.removeItem('token');
+    window.location.href = '/login'
+  }
+return response
 }
 
 export const Roles = {
@@ -30,4 +35,4 @@ export const Roles = {
 
 export const validateManagementMinimumRole = (role) => [Roles.Admin, Roles.Management].includes(role)
 
-export const validateAdminRole = (role) =>  Roles.Admin === role
+export const validateAdminRole = (role) => Roles.Admin === role
