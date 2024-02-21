@@ -36,3 +36,5 @@ export const Roles = {
 export const validateManagementMinimumRole = (role) => [Roles.Admin, Roles.Management].includes(role)
 
 export const validateAdminRole = (role) => Roles.Admin === role
+
+export const validateMechanicRole = (role) => Roles.Mechanic === role

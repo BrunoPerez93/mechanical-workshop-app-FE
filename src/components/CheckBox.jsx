@@ -11,6 +11,7 @@ const CheckBox = ({ id, labelKey, checked, onChange }) => {
     goodPayer: 'Buen Pagador',
     badPayer: 'Mal Pagador',
     normalPayer: 'Pagador Normal',
+    notAccepted: 'No Aceptado'
   };
   
   return (

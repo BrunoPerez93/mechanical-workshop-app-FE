@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import checkMark from '../../assets/check-mark.png'
 import crossMark from '../../assets/cross-mark.png'
-import { validateAdminRole } from "../../utility/common";
+import { validateAdminRole, validateMechanicRole } from "../../utility/common";
 import { useAuth } from "../Context/AuthContext";
 import InputComponent from "../InputComponent";
 
@@ -36,6 +36,7 @@ export const WorkDetails = ({
     goodPayer: 'Buen Pagador',
     badPayer: 'Mal Pagador',
     normalPayer: 'Pagador Normal',
+    notAccepted: 'No Aceptado',
     cel: 'Celular',
     reclame: 'Reclamo',
     autoParts: 'Repuestos',
@@ -106,7 +107,7 @@ export const WorkDetails = ({
   return (
     <div>
       <h3>Detalles del Trabajo</h3>
-      {isEditing && (
+      {isEditing && (validateAdminRole(state.user?.role) || validateMechanicRole(state.user?.role)) &&  (
         <div className="container ">
           <div className="row ">
             <form onSubmit={onSaveClick} className="m-2">
@@ -129,35 +130,37 @@ export const WorkDetails = ({
 
                 const label = fieldLabels[fieldName] || fieldName;
 
-                if (typeof work[fieldName] === "boolean") {
-                  return (
-                    <div key={fieldName} className="form-group mt-2 mb-2">
-                      <label>
-                        {label}
-                        <input
-                          className="form-check-input m-2 "
-                          type="checkbox"
-                          checked={editedFields[fieldName] !== undefined ? editedFields[fieldName] : work[fieldName]}
-                          onChange={(e) => onFieldChange(fieldName, e.target.checked)}
+                if (validateAdminRole(state.user?.role) || (validateMechanicRole(state.user?.role) && (fieldName === "observations" || fieldName === "autoParts"))) {
+                  if (typeof work[fieldName] === "boolean") {
+                    return (
+                      <div key={fieldName} className="form-group mt-2 mb-2">
+                        <label>
+                          {label}
+                          <input
+                            className="form-check-input m-2"
+                            type="checkbox"
+                            checked={editedFields[fieldName] !== undefined ? editedFields[fieldName] : work[fieldName]}
+                            onChange={(e) => onFieldChange(fieldName, e.target.checked)}
+                          />
+                        </label>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
+                        <label>{label}</label>
+                        <InputComponent
+                          type="text"
+                          className="form-control"
+                          value={editedFields[fieldName] ?? work[fieldName]}
+                          onChange={(e) => onFieldChange(fieldName, e.target.value)}
                         />
-                      </label>
-                    </div>
-                  );
+                      </div>
+                    );
+                  }
+                } else {
+                  return null;
                 }
-
-                return (
-
-                  <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                    <label>{label}</label>
-                    <InputComponent
-                      type="text"
-                      className="form-control"
-                      value={editedFields[fieldName] ?? work[fieldName]}
-                      onChange={(e) => onFieldChange(fieldName, e.target.value)}
-                    />
-                  </div>
-
-                );
               })}
               <button type="submit" className="btn btn-primary m-2">
                 Save
@@ -194,6 +197,7 @@ export const WorkDetails = ({
             <p> <span style={{ fontWeight: 'bold' }}>Airbag:</span> {displayStatus(work.airbag)}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Direccion:</span> {displayStatus(work.steer)}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Ta: </span>{displayStatus(work.ta)}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>No Aceptado: </span>{displayStatus(work.notAccepted)}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Buen Pagador: </span>
               {displayStatusPayers(work.goodPayer)}
               <span style={getStatusStyleGood(work.goodPayer)}></span>
@@ -212,7 +216,7 @@ export const WorkDetails = ({
       }
 
       {
-        !isEditing && validateAdminRole(state.user?.role) && (
+        !isEditing && (validateAdminRole(state.user?.role) || validateMechanicRole(state.user?.role)) && (
 
           <button className="btn btn-primary" onClick={onEditClick}>
             Edit

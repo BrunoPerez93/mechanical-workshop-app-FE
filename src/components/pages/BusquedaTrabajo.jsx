@@ -31,7 +31,7 @@ const BusquedaTrabajo = () => {
 
   const searchOptions = {
     matricula: 'Matricula',
-    ci: 'CI',
+    brandName: 'Marca',
     createdAt: 'Fecha',
     mechanicName: 'Tecnico',
     clientName: 'Cliente',
@@ -52,7 +52,6 @@ const BusquedaTrabajo = () => {
         'PUT',
         JSON.stringify(workData),
       );
-
       if (response.ok) {
         setEditedWork()
         setUpdateMessage('Trabajo Modificado')
@@ -196,7 +195,7 @@ const BusquedaTrabajo = () => {
                 <tr>
                   <th>Matricula</th>
                   <th>Cliente</th>
-                  <th>CI</th>
+                  <th>Marca</th>
                   <th>Fecha</th>
                   <th>Tecnico</th>
                 </tr>
@@ -210,7 +209,7 @@ const BusquedaTrabajo = () => {
                       <tr onClick={() => handleRowClick(work)}>
                         <td>{work.matricula}</td>
                         <td>{`${work.client?.name || "N/A"} ${work.client?.lastname || "N/A"}`}</td>
-                        <td>{work.client?.ci || "N/A"}</td>
+                        <td>{work.carsModel?.brand?.brandName || "N/A"}</td>
                         <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
                         <td>{work.mechanic?.userName || "N/A"}</td>
                       </tr>

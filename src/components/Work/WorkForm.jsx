@@ -43,6 +43,7 @@ const WorkForm = ({
     goodPayer: formState.goodPayer || false,
     badPayer: formState.badPayer || false,
     normalPayer: formState.normalPayer || false,
+    notAccepted: formState.notAccepted || false,
   };
 
 

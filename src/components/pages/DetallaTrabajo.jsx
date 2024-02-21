@@ -29,6 +29,7 @@ const DetalleTrabajo = () => {
     goodPayer: false,
     badPayer: false,
     normalPayer: false,
+    notAccepted: false,
     cel: '',
     reclame: '',
     autoParts: '',
@@ -89,6 +90,7 @@ const DetalleTrabajo = () => {
     goodPayer: false,
     badPayer: false,
     normalPayer: false,
+    notAccepted: false,
   });
 
 
@@ -252,7 +254,7 @@ const DetalleTrabajo = () => {
   const handleSaveClient = async (event) => {
     event.preventDefault();
 
-    const existingClient = clients.find((client) => client.ci === clientData.ci);
+   /*  const existingClient = clients.find((client) => client.ci === clientData.ci);
 
     if (existingClient) {
       setCiError('Cedula ya ingresada');
@@ -260,7 +262,7 @@ const DetalleTrabajo = () => {
         setCiError('')
       }, 5000)
       return
-    }
+    } */
 
     try {
       const response = await apiCall(
