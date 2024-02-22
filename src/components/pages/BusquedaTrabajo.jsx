@@ -17,21 +17,17 @@ const BusquedaTrabajo = () => {
   });
 
   const { searchSelect, search, datePickerValue } = formState;
-
   const [works, setWorks] = useState([]);
   const [selectedWork, setSelectedWork] = useState(null);
   const [updateMessage, setUpdateMessage] = useState(null);
-
   const [currentPage, setCurrentPage] = useState(1);
   const worksPerPage = 10;
   const totalPages = works.length > 0 ? Math.ceil(works.length / worksPerPage) : 0;
-
   const [editedWork, setEditedWork] = useState(null);
-
 
   const searchOptions = {
     matricula: 'Matricula',
-    brandName: 'Marca',
+    brandNames: 'Marca',
     createdAt: 'Fecha',
     mechanicName: 'Tecnico',
     clientName: 'Cliente',
@@ -96,7 +92,6 @@ const BusquedaTrabajo = () => {
   };
 
   const handleSearchSelectChange = (value) => {
-
     onInputChange({ target: { name: "searchSelect", value } });
     if (value !== "createdAt") {
       onInputChange({ target: { name: "datePickerValue", value: null } });
@@ -105,14 +100,13 @@ const BusquedaTrabajo = () => {
 
   const handleSearch = async () => {
     let formattedDate = datePickerValue;
-
     if (searchSelect === "createdAt" && datePickerValue) {
       formattedDate = formatISO(datePickerValue);
     }
 
     const filter = { [searchSelect]: searchSelect === "createdAt" ? formattedDate : search };
 
-
+    console.log('search', search);
     await fetchWorks(filter);
 
   };
@@ -132,7 +126,6 @@ const BusquedaTrabajo = () => {
       [fieldName]: value,
     }));
   };
-
 
   useEffect(() => {
     fetchWorks();

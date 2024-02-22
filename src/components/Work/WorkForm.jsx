@@ -2,6 +2,8 @@ import SelectComponent from "../SelectComponent";
 import InputComponent from "../InputComponent";
 import CheckboxGroup from "../CheckBoxGroup";
 import PropTypes from "prop-types";
+import { useAuth } from "../Context/AuthContext";
+import { validateAdminRole } from "../../utility/common";
 
 const WorkForm = ({
   brands,
@@ -20,7 +22,8 @@ const WorkForm = ({
   handleClientChange,
   handleMechanicChange,
   errorMessage,
-
+  handleEditBrand,
+  handleEditModel
 }) => {
   const {
     matricula,
@@ -49,6 +52,9 @@ const WorkForm = ({
 
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
+  const { state } = useAuth();
+
+  //#region Sorted data
 
   const sortedBrands = brands.length > 0
     ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })).sort((a, b) => a.label.localeCompare(b.label))
@@ -63,6 +69,7 @@ const WorkForm = ({
 
   const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));
 
+  //#endregion
 
   return (
     <form onSubmit={handleTrabajoSubmit}>
@@ -82,6 +89,9 @@ const WorkForm = ({
               onChange={handleBrandChange}
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
+            {validateAdminRole(state.user.role) && (
+              <button className="btn btn-primary m-2" onClick={handleEditBrand}>Editar</button>
+            )}
           </div>
 
           {/* MODELO */}
@@ -94,6 +104,9 @@ const WorkForm = ({
 
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarModel}>Agregar</button>
+            {validateAdminRole(state.user.role) && (
+              <button className="btn btn-primary m-2" onClick={handleEditModel}>Editar</button>
+            )}
           </div>
 
           {/* MATRICULA */}
@@ -263,6 +276,8 @@ WorkForm.propTypes = {
   handleClientChange: PropTypes.func.isRequired,
   handleMechanicChange: PropTypes.func.isRequired,
   errorMessage: PropTypes.string,
+  handleEditBrand: PropTypes.func,
+  handleEditModel: PropTypes.func,
 };
 
 export default WorkForm;

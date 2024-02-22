@@ -41,7 +41,7 @@ const AddClientModal = ({
           <input
             type="text"
             className="form-control m-2"
-            placeholder="Cedula del Cliente sin puntos ni guiones"
+            placeholder="Cedula o RUT"
             name="ci"
             value={ci}
             onChange={onInputChange}

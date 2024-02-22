@@ -17,12 +17,8 @@ export const WorkDetails = ({
   onFieldChange,
 }) => {
 
-
-
   const [editedFields, setEditedFields] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-
-
   const { state } = useAuth();
 
   const fieldLabels = {

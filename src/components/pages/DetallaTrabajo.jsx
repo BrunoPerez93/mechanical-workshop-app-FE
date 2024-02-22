@@ -8,6 +8,8 @@ import { apiCall } from "../../utility/common";
 import WorkForm from "../Work/WorkForm";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import BrandEditModal from "../../modals/BrandEditModal";
+import ModelEditModal from "../../modals/ModelEditModal";
 
 
 const DetalleTrabajo = () => {
@@ -41,6 +43,7 @@ const DetalleTrabajo = () => {
 
   const {
     brandName,
+    carName,
     handWork,
     priceAutoParts,
     total,
@@ -71,12 +74,19 @@ const DetalleTrabajo = () => {
   const [showClientModal, setShowClientModal] = useState(false);
   const [showModelModal, setShowModelModal] = useState(false);
   const [showBrandModal, setShowBrandModal] = useState(false);
+  const [showBrandModalEdit, setShowBrandModalEdit] = useState(false);
+  const [showModelModalEdit, setShowModelModalEdit] = useState(false);
+
   const [selectedBrandId, setSelectedBrandId] = useState(null);
+  const [selectedModelId, setSelectedModelId] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
   const [ciError, setCiError] = useState(null);
   const [brandError, setBrandError] = useState(null);
   const [modelError, setModelError] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [brandEditMessage, setBrandEditMessage] = useState(null);
+  const [modelEditMessage, setModelEditMessage] = useState(null);
+  
 
 
   const [works, setWorks] = useState([]);
@@ -150,14 +160,13 @@ const DetalleTrabajo = () => {
     }
   };
 
-
-
   const handleModelChange = (event) => {
     const newModelId = event.target.value;
     const selectedModel = selectedModels.find((model) => model.id === parseInt(newModelId));
 
     if (selectedModel) {
       onInputChange({ target: { name: 'carModelId', value: selectedModel.id } });
+      setSelectedModelId(selectedModel.id)
     } else {
       console.error(`Model with id ${newModelId} not found.`);
     }
@@ -199,6 +208,14 @@ const DetalleTrabajo = () => {
     setShowBrandModal(true);
   };
 
+  const handleEditBrand = () => {
+    setShowBrandModalEdit(true);
+  };
+
+  const handleEditModel = () => {
+    setShowModelModalEdit(true);
+  };
+
   const handleCloseClientModal = () => {
     setShowClientModal(false);
     setCiError(null);
@@ -214,6 +231,17 @@ const DetalleTrabajo = () => {
     setBrandError(null);
   };
 
+  const handleCloseBrandModalEdit = () => {
+    setShowBrandModalEdit(false);
+    setBrandEditMessage(null);
+  };
+
+  const handleCloseModelModalEdit = () => {
+    setShowModelModalEdit(false);
+    setModelEditMessage(null);
+  };
+
+
   const handleCheckbox = (key, value) => {
     setCheckboxData(prevData => ({
       ...prevData,
@@ -221,6 +249,86 @@ const DetalleTrabajo = () => {
     }));
     onInputChange({ target: { name: key, value } });
   };
+
+
+  const handleSaveBrandEdit = async (e, selectedBrandId, brandName) => {
+    try {
+      e.preventDefault();
+
+      const updatedBrandData = {
+        id: selectedBrandId,
+        brandName: brandName,
+      };
+
+      const response = await apiCall(
+        `brands/${selectedBrandId}`,
+        'PUT',
+        JSON.stringify(updatedBrandData),
+      );
+
+      if (response.ok) {
+        setShowBrandModalEdit(false);
+        setBrandEditMessage('Marca Modificada')
+        setTimeout(() => {
+          setBrandEditMessage('')
+        }, 5000)
+        fetchBrands();
+        resetForm();
+      } else {
+        console.error('Error saving brand:', response.status, response.statusText);
+      }
+
+    } catch (error) {
+      console.error('Error saving brand:', error);
+    }
+  }
+
+
+  const handleSaveModelEdit = async (e, selectedModelId,selectedBrandId, carName) => {
+    try {
+      e.preventDefault();
+
+      const updateModelData = {
+        id: selectedModelId,
+        carName: carName,
+        brandId: selectedBrandId, 
+      };
+
+      const response = await apiCall(
+        `carsModels/${selectedModelId}`,
+        'PUT',
+        JSON.stringify(updateModelData),
+      );   
+
+      if (response.ok) {
+        setShowModelModalEdit(false);
+        setModelEditMessage('Modelo Modificada')
+        setTimeout(() => {
+          setModelEditMessage('')
+        }, 5000);
+
+        const updatedModelsResponse = await apiCall(
+          `carsModels?brandId=${selectedBrandId}`,
+          'GET'
+        );
+
+       if (updatedModelsResponse.ok) {
+        const updatedModelList = await updatedModelsResponse.json();
+        setSelectedModels(updatedModelList);
+      } else {
+        console.error(
+          'Error in the server response when fetching models for the brand',
+          updatedModelsResponse.statusText
+        );
+      }
+      resetForm();
+    } else {
+      console.error('Error saving model:', response.status, response.statusText);
+    }
+  } catch (error) {
+    console.error('Error saving model:', error);
+  }
+};
 
   // #endregion
 
@@ -254,15 +362,15 @@ const DetalleTrabajo = () => {
   const handleSaveClient = async (event) => {
     event.preventDefault();
 
-   /*  const existingClient = clients.find((client) => client.ci === clientData.ci);
-
-    if (existingClient) {
-      setCiError('Cedula ya ingresada');
-      setTimeout(() => {
-        setCiError('')
-      }, 5000)
-      return
-    } */
+    /*  const existingClient = clients.find((client) => client.ci === clientData.ci);
+   
+     if (existingClient) {
+       setCiError('Cedula ya ingresada');
+       setTimeout(() => {
+         setCiError('')
+       }, 5000)
+       return
+     } */
 
     try {
       const response = await apiCall(
@@ -324,7 +432,7 @@ const DetalleTrabajo = () => {
 
     if (existingBrand) {
       setBrandError('Marca ya ingresada')
-      setTimeout(() =>{
+      setTimeout(() => {
         setBrandError('')
       }, 5000)
       return
@@ -367,6 +475,7 @@ const DetalleTrabajo = () => {
       if (response.ok) {
         const carModelList = await response.json();
         setModels(carModelList);
+        setSelectedModels(carModelList);
       } else {
         console.error(
           "Error en la respuesta del servidor al pedir el listado",
@@ -508,7 +617,7 @@ const DetalleTrabajo = () => {
       return;
     }
 
-    const { ci, name, lastname, ...cleanedFormState } = formState;
+    const {/*  ci, name, lastname, */ ...cleanedFormState } = formState;
 
     const updatedFormState = {
       ...cleanedFormState,
@@ -564,6 +673,8 @@ const DetalleTrabajo = () => {
         handleClientChange={handleClientChange}
         handleMechanicChange={handleMechanicChange}
         errorMessage={errorMessage}
+        handleEditBrand={handleEditBrand}
+        handleEditModel={handleEditModel}
       />
 
 
@@ -598,6 +709,34 @@ const DetalleTrabajo = () => {
         onInputChange={onInputChange}
         brandName={brandName || ''}
         brandError={brandError}
+      />
+
+      <BrandEditModal
+        show={showBrandModalEdit}
+        handleClose={handleCloseBrandModalEdit}
+        brandEditMessage={brandEditMessage}
+        onInputChange={onInputChange}
+        selectedBrandId={selectedBrandId}
+        handleBrandChange={handleBrandChange}
+        brands={brands}
+        brandName={brandName}
+        handleSaveBrandEdit={(e) => handleSaveBrandEdit(e, selectedBrandId, brandName)}
+      />
+
+      <ModelEditModal
+        show={showModelModalEdit}
+        handleClose={handleCloseModelModalEdit}
+        modelEditMessage={modelEditMessage}
+        onCarNameChange={onInputChange}
+        selectedModelId={selectedModelId}
+        handleModelChange={(e) => {
+          handleModelChange(e);
+          setSelectedModelId(e.target.value);
+        }}
+        models={models}
+        selectedBrandId={selectedBrandId}
+        handleSaveModelEdit={(e) => handleSaveModelEdit(e, selectedModelId, selectedBrandId, carName)}
+        carName={carName}
       />
 
     </>
