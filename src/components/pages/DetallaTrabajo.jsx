@@ -86,7 +86,7 @@ const DetalleTrabajo = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [brandEditMessage, setBrandEditMessage] = useState(null);
   const [modelEditMessage, setModelEditMessage] = useState(null);
-  
+
 
 
   const [works, setWorks] = useState([]);
@@ -147,7 +147,7 @@ const DetalleTrabajo = () => {
         const modelList = await response.json();
         setSelectedModels(modelList);
 
-        onInputChange({ target: { name: 'carModelId', value: selectedBrand.id } });
+        onInputChange({ target: { name: 'carModelId', value: '' } });
         setSelectedBrandId(selectedBrand.id);
       } else {
         console.error(
@@ -156,6 +156,8 @@ const DetalleTrabajo = () => {
         );
       }
     } else {
+      onInputChange({ target: { name: 'carModelId', value: '' } });
+      setSelectedModels([]);
       console.error(`Brand with id ${newBrandId} not found.`);
     }
   };
@@ -284,21 +286,21 @@ const DetalleTrabajo = () => {
   }
 
 
-  const handleSaveModelEdit = async (e, selectedModelId,selectedBrandId, carName) => {
+  const handleSaveModelEdit = async (e, selectedModelId, selectedBrandId, carName) => {
     try {
       e.preventDefault();
 
       const updateModelData = {
         id: selectedModelId,
         carName: carName,
-        brandId: selectedBrandId, 
+        brandId: selectedBrandId,
       };
 
       const response = await apiCall(
         `carsModels/${selectedModelId}`,
         'PUT',
         JSON.stringify(updateModelData),
-      );   
+      );
 
       if (response.ok) {
         setShowModelModalEdit(false);
@@ -312,23 +314,23 @@ const DetalleTrabajo = () => {
           'GET'
         );
 
-       if (updatedModelsResponse.ok) {
-        const updatedModelList = await updatedModelsResponse.json();
-        setSelectedModels(updatedModelList);
+        if (updatedModelsResponse.ok) {
+          const updatedModelList = await updatedModelsResponse.json();
+          setSelectedModels(updatedModelList);
+        } else {
+          console.error(
+            'Error in the server response when fetching models for the brand',
+            updatedModelsResponse.statusText
+          );
+        }
+        resetForm();
       } else {
-        console.error(
-          'Error in the server response when fetching models for the brand',
-          updatedModelsResponse.statusText
-        );
+        console.error('Error saving model:', response.status, response.statusText);
       }
-      resetForm();
-    } else {
-      console.error('Error saving model:', response.status, response.statusText);
+    } catch (error) {
+      console.error('Error saving model:', error);
     }
-  } catch (error) {
-    console.error('Error saving model:', error);
-  }
-};
+  };
 
   // #endregion
 
@@ -733,10 +735,10 @@ const DetalleTrabajo = () => {
           handleModelChange(e);
           setSelectedModelId(e.target.value);
         }}
-        models={models}
-        selectedBrandId={selectedBrandId}
+        models={selectedModels}
         handleSaveModelEdit={(e) => handleSaveModelEdit(e, selectedModelId, selectedBrandId, carName)}
         carName={carName}
+
       />
 
     </>

@@ -10,14 +10,12 @@ const ModelEditModal = ({
   onCarNameChange,
   modelEditMessage,
   handleModelChange,
-  selectedBrandId,
   selectedModelId,
   models,
   carName,
 }) => {
 
-  const filteredModels = models.filter((model) => model.brandId === selectedBrandId);
-  const sortedModels = filteredModels.map((model) => ({ value: model.id, label: model.carName })).sort((a, b) => a.label.localeCompare(b.label));
+  const sortedModels = models.map((model) => ({ value: model.id, label: model.carName })).sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -70,7 +68,6 @@ ModelEditModal.propTypes = {
   models: PropTypes.array.isRequired,
   carName: PropTypes.string,
   selectedModelId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  selectedBrandId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default ModelEditModal;
