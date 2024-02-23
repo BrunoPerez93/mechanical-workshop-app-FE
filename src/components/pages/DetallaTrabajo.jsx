@@ -477,10 +477,30 @@ const DetalleTrabajo = () => {
       if (response.ok) {
         const carModelList = await response.json();
         setModels(carModelList);
-        setSelectedModels(carModelList);
+        if (brands.length > 0) {
+          setSelectedBrandId(brands[0].id);
+        }
+  
+        // Fetch models for the selected brand
+        if (brands.length > 0) {
+          const updatedModelsResponse = await apiCall(
+            `carsModels?brandId=${selectedBrandId}`,
+            "GET"
+          );
+  
+          if (updatedModelsResponse.ok) {
+            const updatedModelList = await updatedModelsResponse.json();
+            setSelectedModels(updatedModelList);
+          } else {
+            console.error(
+              "Error in the server response when fetching models for the brand",
+              updatedModelsResponse.statusText
+            );
+          }
+        }
       } else {
         console.error(
-          "Error en la respuesta del servidor al pedir el listado",
+          "Error in the server response when fetching models",
           response.statusText
         );
       }

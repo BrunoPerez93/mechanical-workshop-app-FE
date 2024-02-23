@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import checkMark from '../../assets/check-mark.png'
 import crossMark from '../../assets/cross-mark.png'
-import { validateAdminRole, validateMechanicRole } from "../../utility/common";
+import { validateAdminRole, validateManagementMinimumRole, validateMechanicRole } from "../../utility/common";
 import { useAuth } from "../Context/AuthContext";
 import InputComponent from "../InputComponent";
 
@@ -103,7 +103,7 @@ export const WorkDetails = ({
   return (
     <div>
       <h3>Detalles del Trabajo</h3>
-      {isEditing && (validateAdminRole(state.user?.role) || validateMechanicRole(state.user?.role)) &&  (
+      {isEditing && (validateAdminRole(state.user?.role) || validateMechanicRole(state.user?.role)) && (
         <div className="container ">
           <div className="row ">
             <form onSubmit={onSaveClick} className="m-2">
@@ -187,7 +187,12 @@ export const WorkDetails = ({
               </>
             )}
 
-            <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {work.total || 0}</p>
+            {validateManagementMinimumRole(state.user?.role) && (
+              <>
+                <p> <span style={{ fontWeight: 'bold' }}>Total Presupuesto:</span> $ {work.total || 0}</p>
+              </>
+            )}
+
             <p> <span style={{ fontWeight: 'bold' }}>ABS:</span> {displayStatus(work.abs)}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Motor:</span> {displayStatus(work.engine)}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Airbag:</span> {displayStatus(work.airbag)}</p>
