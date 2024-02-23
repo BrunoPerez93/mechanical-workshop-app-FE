@@ -64,7 +64,7 @@ const WorkForm = ({
 
   const sortedClients = clients.map((client) => ({
     value: client.id,
-    label: `${client.name} ${client.lastname} ${client.ci}`
+    label: `${client.name} ${client.lastname}` + `${client.ci ? ' ' + client.ci : '' }`
   })).sort((a, b) => a.label.localeCompare(b.label));
 
   const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));

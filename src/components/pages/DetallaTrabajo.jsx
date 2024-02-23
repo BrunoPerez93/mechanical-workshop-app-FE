@@ -619,7 +619,7 @@ const DetalleTrabajo = () => {
       return;
     }
 
-    const {/*  ci, name, lastname, */ ...cleanedFormState } = formState;
+    const { ...cleanedFormState } = formState;
 
     const updatedFormState = {
       ...cleanedFormState,
@@ -629,6 +629,7 @@ const DetalleTrabajo = () => {
       handWork: parseFloat(formState.handWork),
       priceAutoParts: parseFloat(formState.priceAutoParts),
       total: parseFloat(formState.total),
+      carModelId: selectedModelId,
     };
     try {
       const response = await apiCall(
