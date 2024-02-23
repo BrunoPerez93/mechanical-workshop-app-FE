@@ -106,7 +106,6 @@ const BusquedaTrabajo = () => {
 
     const filter = { [searchSelect]: searchSelect === "createdAt" ? formattedDate : search };
 
-    console.log('search', search);
     await fetchWorks(filter);
 
   };
