@@ -8,6 +8,7 @@ const AdministrarUsuario = () => {
 
   const [users, setUsers] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
+  const [failMessage, setFailMessage] = useState('');
 
   const { formState, onInputChange, resetForm } = useForm({
     userName: "",
@@ -64,6 +65,10 @@ const AdministrarUsuario = () => {
           setSuccessMessage('');
         }, 5000);
       } else {
+        setFailMessage('Usuario ya ingresado utilice otro nombre.');
+        setTimeout(() => {
+          setFailMessage('');
+        }, 5000);
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
           response.statusText
@@ -89,6 +94,10 @@ const AdministrarUsuario = () => {
 
         {successMessage && (
           <div className="alert alert-success mt-2">{successMessage}</div>
+        )}
+
+        {failMessage && (
+          <div className="alert alert-danger mt-2">{failMessage}</div>
         )}
 
         <UserList

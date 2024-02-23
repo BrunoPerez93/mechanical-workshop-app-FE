@@ -80,6 +80,7 @@ const DetalleTrabajo = () => {
   const [selectedBrandId, setSelectedBrandId] = useState(null);
   const [selectedModelId, setSelectedModelId] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
+
   const [ciError, setCiError] = useState(null);
   const [brandError, setBrandError] = useState(null);
   const [modelError, setModelError] = useState(null);
@@ -215,6 +216,8 @@ const DetalleTrabajo = () => {
   };
 
   const handleEditModel = () => {
+    setSelectedModelId(selectedModelId)
+    onInputChange({ target: { name: 'carName', value: carName } });
     setShowModelModalEdit(true);
   };
 
@@ -430,7 +433,10 @@ const DetalleTrabajo = () => {
   const handleSaveBrand = async (event) => {
     event.preventDefault();
 
-    const existingBrand = brands.find((brand) => brand.brandName === brandData.brandName);
+    const newBrandName = brandData.brandName.toLowerCase(); 
+
+    const existingBrand = brands.find((brand) => brand.brandName.toLowerCase() === newBrandName);
+  
 
     if (existingBrand) {
       setBrandError('Marca ya ingresada')
@@ -481,7 +487,7 @@ const DetalleTrabajo = () => {
           setSelectedBrandId(brands[0].id);
         }
   
-        // Fetch models for the selected brand
+
         if (brands.length > 0) {
           const updatedModelsResponse = await apiCall(
             `carsModels?brandId=${selectedBrandId}`,
@@ -518,8 +524,9 @@ const DetalleTrabajo = () => {
   const handleSaveModels = async (event) => {
     event.preventDefault();
 
-    const existingModel = models.find(
-      (model) => model.carName === modelData.carName);
+    const newCarName = modelData.carName.toLowerCase(); 
+ 
+    const existingModel = models.find((model) => model.carName.toLowerCase() === newCarName);  
 
     if (existingModel) {
       setModelError(`El modelo ya está ingresado`);
