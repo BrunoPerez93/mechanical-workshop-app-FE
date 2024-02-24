@@ -24,7 +24,7 @@ export const apiCall = async (path, method, body, queryParams, isWithoutToken) =
     localStorage.removeItem('token');
     window.location.href = '/login'
   }
-return response
+  return response
 }
 
 export const Roles = {

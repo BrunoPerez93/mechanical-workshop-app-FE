@@ -265,27 +265,33 @@ const DetalleTrabajo = () => {
         id: selectedBrandId,
         brandName: brandName,
       };
+      if (selectedBrandId) {
+        const response = await apiCall(
+          `brands/${selectedBrandId}`,
+          'PUT',
+          JSON.stringify(updatedBrandData),
+        );
 
-      const response = await apiCall(
-        `brands/${selectedBrandId}`,
-        'PUT',
-        JSON.stringify(updatedBrandData),
-      );
-
-      if (response.ok) {
-        setShowBrandModalEdit(false);
-        setBrandEditMessage('Marca Modificada')
-        setTimeout(() => {
-          setBrandEditMessage('')
-        }, 5000)
-        fetchBrands();
-        resetForm();
+        if (response.ok) {
+          setShowBrandModalEdit(false);
+          setBrandEditMessage('Marca Modificada')
+          setTimeout(() => {
+            setBrandEditMessage('')
+          }, 5000)
+          fetchBrands();
+          resetForm();
+        } else {
+          setBrandEditMessageError('Ocurrio un error. Contacte a su administrador.');
+          setTimeout(() => {
+            setBrandEditMessageError('')
+          }, 5000)
+          console.error('Error saving brand:', response.status, response.statusText);
+        }
       } else {
-        setBrandEditMessageError('Seleccione una marca antes de editar')
+        setBrandEditMessageError('Seleccione una marca antes de editar');
         setTimeout(() => {
           setBrandEditMessageError('')
         }, 5000)
-        console.error('Error saving brand:', response.status, response.statusText);
       }
 
     } catch (error) {
@@ -303,37 +309,44 @@ const DetalleTrabajo = () => {
         carName: carName,
       };
 
-      const response = await apiCall(
-        `carsModels/${selectedModelId}`,
-        'PUT',
-        JSON.stringify(updateModelData),
-      );
-
-      if (response.ok) {
-        setShowModelModalEdit(false);
-        setModelEditMessage('Modelo Modificada')
-        setTimeout(() => {
-          setModelEditMessage('')
-        }, 5000);
-
-        const updatedModelsResponse = await apiCall(
-          `carsModels?brandId=${selectedBrandId}`,
-          'GET'
+      if (selectedModelId) {
+        const response = await apiCall(
+          `carsModels/${selectedModelId}`,
+          'PUT',
+          JSON.stringify(updateModelData),
         );
 
-        if (updatedModelsResponse.ok) {
-          const updatedModelList = await updatedModelsResponse.json();
-          setSelectedModels(updatedModelList);
-        } else {
-          console.error(
-            'Error in the server response when fetching models for the brand',
-            updatedModelsResponse.statusText
+        if (response.ok) {
+          setShowModelModalEdit(false);
+          setModelEditMessage('Modelo Modificada')
+          setTimeout(() => {
+            setModelEditMessage('')
+          }, 5000);
+
+          const updatedModelsResponse = await apiCall(
+            `carsModels?brandId=${selectedBrandId}`,
+            'GET'
           );
+
+          if (updatedModelsResponse.ok) {
+            const updatedModelList = await updatedModelsResponse.json();
+            setSelectedModels(updatedModelList);
+          } else {
+            console.error(
+              'Error in the server response when fetching models for the brand',
+              updatedModelsResponse.statusText
+            );
+          }
+          resetForm();
+        } else {
+          setModelEditMessageError('Ocurrio un error. Contacte a su administrador.');
+          setTimeout(() => {
+            setModelEditMessageError('')
+          }, 5000);
+          console.error('Error saving model:', response.status, response.statusText);
         }
-        resetForm();
       } else {
-        console.error('Error saving model:', response.status, response.statusText);
-        setModelEditMessageError('Seleccione un modelo antes de editar')
+        setModelEditMessageError('Seleccione un modelo antes de editar');
         setTimeout(() => {
           setModelEditMessageError('')
         }, 5000);

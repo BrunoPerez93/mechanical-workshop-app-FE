@@ -15,7 +15,7 @@ const ModelEditModal = ({
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Editar Marca</Modal.Title>
+        <Modal.Title>Editar Modelo</Modal.Title>
       </Modal.Header>
       <Modal.Body>
 
@@ -37,7 +37,7 @@ const ModelEditModal = ({
               Cerrar
             </Button>
             <Button variant="primary" type="submit">
-              Guardar Marca
+              Guardar Modelo
             </Button>
           </Modal.Footer>
         </form>
