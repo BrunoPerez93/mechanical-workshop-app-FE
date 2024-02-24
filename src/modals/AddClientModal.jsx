@@ -11,7 +11,13 @@ const AddClientModal = ({
   lastname,
   ci,
   ciError,
+  clientErrorMessage,
 }) => {
+  
+  const handleInvalid = (e) => {
+    e.target.setCustomValidity('El parametro es requerido.');
+  };
+
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -27,6 +33,7 @@ const AddClientModal = ({
             name="name"
             value={name}
             onChange={onInputChange}
+            onInvalid={handleInvalid}
             required
           />
           <input
@@ -36,6 +43,7 @@ const AddClientModal = ({
             name="lastname"
             value={lastname}
             onChange={onInputChange}
+            onInvalid={handleInvalid}
             required
           />
           <input
@@ -47,6 +55,7 @@ const AddClientModal = ({
             onChange={onInputChange}
           />
           {ciError && <div className="alert alert-danger error-message">{ciError}</div>}
+          {clientErrorMessage && <div className="alert alert-danger error-message">{clientErrorMessage}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar
@@ -70,6 +79,7 @@ AddClientModal.propTypes = {
   lastname: PropTypes.string,
   ci: PropTypes.string,
   ciError: PropTypes.string,
+  clientErrorMessage: PropTypes.string,
 };
 
 export default AddClientModal;

@@ -1,7 +1,6 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-import SelectComponent from "../components/SelectComponent";
 
 const ModelEditModal = ({
   show,
@@ -9,13 +8,9 @@ const ModelEditModal = ({
   handleSaveModelEdit,
   onCarNameChange,
   modelEditMessage,
-  handleModelChange,
-  selectedModelId,
-  models,
   carName,
+  modelEditMessageError
 }) => {
-
-  const sortedModels = models.map((model) => ({ value: model.id, label: model.carName })).sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -28,22 +23,15 @@ const ModelEditModal = ({
           <input
             type="text"
             className="form-control m-2"
-            placeholder="Nombre del Cliente"
+            placeholder="Nombre Modelo Nuevo"
             name="carName"
             value={carName || ''}
             onChange={onCarNameChange}
             required
           />
-          <div className="form-group">
-            <label>Modelo</label>
-            <SelectComponent
-              options={sortedModels}
-              value={selectedModelId || ''}
-              onChange={handleModelChange}
-              required
-            />
-          </div>
+   
           {modelEditMessage && <div className="alert alert-success">{modelEditMessage}</div>}
+          {modelEditMessageError && <div className="alert alert-danger">{modelEditMessageError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar
@@ -68,6 +56,7 @@ ModelEditModal.propTypes = {
   models: PropTypes.array.isRequired,
   carName: PropTypes.string,
   selectedModelId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  modelEditMessageError: PropTypes.string,
 };
 
 export default ModelEditModal;

@@ -1,7 +1,6 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-import SelectComponent from "../components/SelectComponent";
 
 const AddModelModal = ({
   show,
@@ -9,10 +8,7 @@ const AddModelModal = ({
   handleSaveModels,
   onInputChange,
   carName,
-  brands,
-  handleBrandChange,
   modelData,
-  selectedBrandId,
   modelError,
 
 }) => {
@@ -36,21 +32,6 @@ const AddModelModal = ({
             />
           </div>
 
-          <div className="form-group">
-            <label>Marca</label>
-            <SelectComponent
-              options={
-                brands.length > 0
-                  ? brands.map((brand) => ({
-                    value: brand.id,
-                    label: brand.brandName
-                  }))
-                  : []}
-              value={selectedBrandId || ''}
-              onChange={handleBrandChange}
-              required
-            />
-          </div>
           {modelError && <div className="alert alert-danger error-message">{modelError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>

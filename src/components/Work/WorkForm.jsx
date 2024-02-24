@@ -64,7 +64,7 @@ const WorkForm = ({
 
   const sortedClients = clients.map((client) => ({
     value: client.id,
-    label: `${client.name} ${client.lastname}` + `${client.ci ? ' ' + client.ci : '' }`
+    label: `${client.name} ${client.lastname}` + `${client.ci ? ' ' + client.ci : ''}`
   })).sort((a, b) => a.label.localeCompare(b.label));
 
   const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));
@@ -90,7 +90,12 @@ const WorkForm = ({
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
             {validateAdminRole(state.user.role) && (
-              <button className="btn btn-primary m-2" onClick={handleEditBrand}>Editar</button>
+              <button
+                className="btn btn-primary m-2"
+                onClick={handleEditBrand}
+              >
+                Editar
+              </button>
             )}
           </div>
 
@@ -105,7 +110,12 @@ const WorkForm = ({
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarModel}>Agregar</button>
             {validateAdminRole(state.user.role) && (
-              <button className="btn btn-primary m-2" onClick={handleEditModel}>Editar</button>
+              <button
+                className="btn btn-primary m-2"
+                onClick={handleEditModel}
+              >
+                Editar
+              </button>
             )}
           </div>
 

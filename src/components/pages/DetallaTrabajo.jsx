@@ -68,7 +68,6 @@ const DetalleTrabajo = () => {
   //#region States
 
   const [brands, setBrands] = useState([]);
-  const [models, setModels] = useState([]);
   const [clients, setClients] = useState([]);
   const [mechanics, setMechanics] = useState([]);
   const [showClientModal, setShowClientModal] = useState(false);
@@ -87,10 +86,9 @@ const DetalleTrabajo = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [brandEditMessage, setBrandEditMessage] = useState(null);
   const [modelEditMessage, setModelEditMessage] = useState(null);
-
-
-
-  const [works, setWorks] = useState([]);
+  const [brandEditMessageError, setBrandEditMessageError] = useState(null);
+  const [modelEditMessageError, setModelEditMessageError] = useState(null);
+  const [clientErrorMessage, setClientErrorMessage] = useState(null);
 
   const [checkboxData, setCheckboxData] = useState({
     abs: false,
@@ -224,6 +222,7 @@ const DetalleTrabajo = () => {
   const handleCloseClientModal = () => {
     setShowClientModal(false);
     setCiError(null);
+    setClientErrorMessage(null)
   };
 
   const handleCloseModelModal = () => {
@@ -239,11 +238,13 @@ const DetalleTrabajo = () => {
   const handleCloseBrandModalEdit = () => {
     setShowBrandModalEdit(false);
     setBrandEditMessage(null);
+    setBrandEditMessageError(null)
   };
 
   const handleCloseModelModalEdit = () => {
     setShowModelModalEdit(false);
     setModelEditMessage(null);
+    setModelEditMessageError(null);
   };
 
 
@@ -280,6 +281,10 @@ const DetalleTrabajo = () => {
         fetchBrands();
         resetForm();
       } else {
+        setBrandEditMessageError('Seleccione una marca antes de editar')
+        setTimeout(() => {
+          setBrandEditMessageError('')
+        }, 5000)
         console.error('Error saving brand:', response.status, response.statusText);
       }
 
@@ -289,14 +294,13 @@ const DetalleTrabajo = () => {
   }
 
 
-  const handleSaveModelEdit = async (e, selectedModelId, selectedBrandId, carName) => {
+  const handleSaveModelEdit = async (e, selectedModelId, carName) => {
     try {
       e.preventDefault();
 
       const updateModelData = {
         id: selectedModelId,
         carName: carName,
-        brandId: selectedBrandId,
       };
 
       const response = await apiCall(
@@ -329,6 +333,10 @@ const DetalleTrabajo = () => {
         resetForm();
       } else {
         console.error('Error saving model:', response.status, response.statusText);
+        setModelEditMessageError('Seleccione un modelo antes de editar')
+        setTimeout(() => {
+          setModelEditMessageError('')
+        }, 5000);
       }
     } catch (error) {
       console.error('Error saving model:', error);
@@ -367,16 +375,6 @@ const DetalleTrabajo = () => {
   const handleSaveClient = async (event) => {
     event.preventDefault();
 
-    /*  const existingClient = clients.find((client) => client.ci === clientData.ci);
-   
-     if (existingClient) {
-       setCiError('Cedula ya ingresada');
-       setTimeout(() => {
-         setCiError('')
-       }, 5000)
-       return
-     } */
-
     try {
       const response = await apiCall(
         "clients",
@@ -386,7 +384,15 @@ const DetalleTrabajo = () => {
 
       if (response.ok) {
         fetchClients();
+        resetForm();
+        setShowClientModal(false);
       } else {
+
+        setClientErrorMessage('Cliente con Ci o Rut ya ingresado.')
+        setTimeout(() => {
+          setClientErrorMessage('')
+        }, 5000);
+
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
           response.statusText
@@ -395,7 +401,7 @@ const DetalleTrabajo = () => {
     } catch (error) {
       console.error("Error", error);
     }
-    setShowClientModal(false);
+
   };
 
   //#endregion
@@ -433,19 +439,6 @@ const DetalleTrabajo = () => {
   const handleSaveBrand = async (event) => {
     event.preventDefault();
 
-    const newBrandName = brandData.brandName.toLowerCase(); 
-
-    const existingBrand = brands.find((brand) => brand.brandName.toLowerCase() === newBrandName);
-  
-
-    if (existingBrand) {
-      setBrandError('Marca ya ingresada')
-      setTimeout(() => {
-        setBrandError('')
-      }, 5000)
-      return
-    }
-
     try {
       const response = await apiCall(
         "brands",
@@ -456,7 +449,14 @@ const DetalleTrabajo = () => {
       if (response.ok) {
         fetchBrands();
         resetForm();
+        setShowBrandModal(false)
       } else {
+
+        setBrandError('Marca ya ingresada')
+        setTimeout(() => {
+          setBrandError('')
+        }, 5000);
+
         console.error(
           "Error en la respuesta del servidor al crear la marca",
           response.statusText
@@ -465,7 +465,6 @@ const DetalleTrabajo = () => {
     } catch (error) {
       console.error("Error", error);
     }
-    setShowBrandModal(false);
   };
 
 
@@ -481,19 +480,13 @@ const DetalleTrabajo = () => {
       );
 
       if (response.ok) {
-        const carModelList = await response.json();
-        setModels(carModelList);
-        if (brands.length > 0) {
-          setSelectedBrandId(brands[0].id);
-        }
-  
 
         if (brands.length > 0) {
           const updatedModelsResponse = await apiCall(
             `carsModels?brandId=${selectedBrandId}`,
             "GET"
           );
-  
+
           if (updatedModelsResponse.ok) {
             const updatedModelList = await updatedModelsResponse.json();
             setSelectedModels(updatedModelList);
@@ -516,25 +509,12 @@ const DetalleTrabajo = () => {
   };
 
   useEffect(() => {
-
     fetchModels();
   }, []);
 
 
   const handleSaveModels = async (event) => {
     event.preventDefault();
-
-    const newCarName = modelData.carName.toLowerCase(); 
- 
-    const existingModel = models.find((model) => model.carName.toLowerCase() === newCarName);  
-
-    if (existingModel) {
-      setModelError(`El modelo ya está ingresado`);
-      setTimeout(() => {
-        setModelError('')
-      }, 5000)
-      return;
-    }
 
     const updatedModelData = {
       ...modelData,
@@ -555,8 +535,8 @@ const DetalleTrabajo = () => {
         );
 
         if (updatedModelsResponse.ok) {
-          const updatedModelList = await updatedModelsResponse.json();
-          setSelectedModels(updatedModelList);
+          const updatedCarModelName = await updatedModelsResponse.json();
+          setSelectedModels(updatedCarModelName);
         } else {
           console.error(
             "Error in the server response when fetching models for the brand",
@@ -566,6 +546,12 @@ const DetalleTrabajo = () => {
         resetForm();
         setShowModelModal(false);
       } else {
+
+        setModelError('Modelo ya ingresado')
+        setTimeout(() => {
+          setModelError('')
+        }, 5000);
+
         console.error(
           "Error en la respuesta del servidor al crear el modelo",
           response.statusText
@@ -574,7 +560,6 @@ const DetalleTrabajo = () => {
     } catch (error) {
       console.error("Error", error);
     }
-    setShowModelModal(false);
     fetchModels();
   };
 
@@ -613,32 +598,6 @@ const DetalleTrabajo = () => {
 
   //#region Fetch Work
 
-  const fetchWorks = async () => {
-    try {
-      const response = await apiCall(
-        "works",
-        "GET",
-      );
-
-      if (response.ok) {
-        const workList = await response.json();
-
-        setWorks(workList);
-      } else {
-        console.error(
-          "Error en la respuesta del servidor al pedir el listado",
-          response.statusText
-        );
-      }
-    } catch (error) {
-      console.error("Error", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchWorks();
-  }, []);
-
   const handleTrabajoSubmit = async (event) => {
     event.preventDefault();
 
@@ -666,7 +625,6 @@ const DetalleTrabajo = () => {
       );
 
       if (response.ok) {
-        fetchWorks();
         resetForm();
         navigate('/');
       } else {
@@ -715,6 +673,7 @@ const DetalleTrabajo = () => {
         handleSaveClient={handleSaveClient}
         onInputChange={onInputChange}
         ciError={ciError}
+        clientErrorMessage={clientErrorMessage}
       />
 
       <AddModelModal
@@ -751,6 +710,8 @@ const DetalleTrabajo = () => {
         brands={brands}
         brandName={brandName}
         handleSaveBrandEdit={(e) => handleSaveBrandEdit(e, selectedBrandId, brandName)}
+        brandEditMessageError={brandEditMessageError}
+
       />
 
       <ModelEditModal
@@ -764,8 +725,9 @@ const DetalleTrabajo = () => {
           setSelectedModelId(e.target.value);
         }}
         models={selectedModels}
-        handleSaveModelEdit={(e) => handleSaveModelEdit(e, selectedModelId, selectedBrandId, carName)}
+        handleSaveModelEdit={(e) => handleSaveModelEdit(e, selectedModelId, carName)}
         carName={carName}
+        modelEditMessageError={modelEditMessageError}
 
       />
 

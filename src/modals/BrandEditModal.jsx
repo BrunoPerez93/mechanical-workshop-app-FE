@@ -1,7 +1,6 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-import SelectComponent from "../components/SelectComponent";
 
 const BrandEditModal = ({
   show,
@@ -10,15 +9,9 @@ const BrandEditModal = ({
   onInputChange,
   brandEditMessage,
   selectedBrandId,
-  handleBrandChange,
-  brands,
   brandName,
+  brandEditMessageError,
 }) => {
-
-  const sortedBrands = brands.length > 0
-  ? brands.map((brand) => ({ value: brand.id, label: brand.brandName })).sort((a, b) => a.label.localeCompare(b.label))
-  : [];
-
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -37,16 +30,9 @@ const BrandEditModal = ({
             onChange={onInputChange}
             required
           />
-          <div className="form-group">
-            <label>Marca</label>
-            <SelectComponent
-              options={sortedBrands}
-              value={selectedBrandId || ''}
-              onChange={handleBrandChange}
-              required
-            />
-          </div>
+     
           {brandEditMessage && <div className="alert alert-success">{brandEditMessage}</div>}
+          {brandEditMessageError && <div className="alert alert-danger">{brandEditMessageError}</div>}
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Cerrar
@@ -69,8 +55,8 @@ BrandEditModal.propTypes = {
   brandEditMessage: PropTypes.string,
   selectedBrandId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   handleBrandChange: PropTypes.func.isRequired,
-  brands: PropTypes.array.isRequired,
   brandName: PropTypes.string,
+  brandEditMessageError: PropTypes.string,
 };
 
 export default BrandEditModal;
