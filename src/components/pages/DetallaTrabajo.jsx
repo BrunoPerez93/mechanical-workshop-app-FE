@@ -392,7 +392,7 @@ const DetalleTrabajo = () => {
       const response = await apiCall(
         "clients",
         "POST",
-        JSON.stringify(clientData)
+        JSON.stringify({ ...clientData, ci: clientData.ci || null })
       );
 
       if (response.ok) {
