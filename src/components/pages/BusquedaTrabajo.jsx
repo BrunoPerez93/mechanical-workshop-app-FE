@@ -16,6 +16,8 @@ const BusquedaTrabajo = () => {
     datePickerValue: null,
   });
 
+
+
   const { searchSelect, search, datePickerValue } = formState;
   const [works, setWorks] = useState([]);
   const [selectedWork, setSelectedWork] = useState(null);
@@ -29,13 +31,15 @@ const BusquedaTrabajo = () => {
     matricula: 'Matricula',
     brandNames: 'Marca',
     createdAt: 'Fecha',
-    mechanicName: 'Tecnico',
+    // mechanicName: 'Tecnico',
     clientName: 'Cliente',
   };
+
 
   const handleSaveClick = async (e) => {
     try {
       e.preventDefault()
+
       const { ...workData } = editedWork;
 
       setEditedWork((prevEditedWork) => {
@@ -72,6 +76,8 @@ const BusquedaTrabajo = () => {
 
   const fetchWorks = async (filter) => {
     try {
+
+
       const response = await apiCall("works", "GET", null, filter);
 
       if (response.ok) {
@@ -196,37 +202,38 @@ const BusquedaTrabajo = () => {
 
                 {works
                   .slice((currentPage - 1) * worksPerPage, currentPage * worksPerPage)
-                  .map((work) => (
-                    <React.Fragment key={work.id}>
-                      <tr onClick={() => handleRowClick(work)}>
-                        <td>{work.matricula}</td>
-                        <td>{`${work.client?.name || "N/A"} ${work.client?.lastname || "N/A"}`}</td>
-                        <td>{work.carsModel?.brand?.brandName || "N/A"}</td>
-                        <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
-                        <td>{work.mechanic?.userName || "N/A"}</td>
-                      </tr>
+                  .map((work) => {
+                    return (
+                      <React.Fragment key={work.id}>
+                        <tr onClick={() => handleRowClick(work)}>
+                          <td>{work.matricula}</td>
+                          <td>{`${work.client?.name || "N/A"} ${work.client?.lastname}`}</td>
+                          <td>{work.carsModel?.brand?.brandName || "N/A"}</td>
+                          <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
+                          <td>{work.mechanic && work.mechanic.userName !== undefined ? work.mechanic.userName : "N/A"}</td>
 
-
-                      {(selectedWork === work || (editedWork && editedWork.id === work.id)) && (
-                        <tr>
-                          <td colSpan="8">
-                            <WorkDetails
-                              mechanicDetails={editedWork?.mechanicDetails || selectedWork?.mechanic}
-                              clientDetails={editedWork?.clientDetails || selectedWork?.client}
-                              carsModelDetails={editedWork?.carsModelDetails || selectedWork?.carsModel}
-                              work={editedWork || selectedWork}
-                              isEditing={editedWork?.isEditing}
-                              onEditClick={() => handleEditClick(work)}
-                              onSaveClick={handleSaveClick}
-                              onFieldChange={(fieldName, value) => handleFieldChange(fieldName, value)}
-
-                            />
-
-                          </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
+
+                        {(selectedWork === work || (editedWork && editedWork.id === work.id)) && (
+                          <tr>
+                            <td colSpan="8">
+                              <WorkDetails
+                                mechanicDetails={editedWork?.mechanicDetails || selectedWork?.mechanic}
+                                clientDetails={editedWork?.clientDetails || selectedWork?.client}
+                                carsModelDetails={editedWork?.carsModelDetails || selectedWork?.carsModel}
+                                work={editedWork || selectedWork}
+                                isEditing={editedWork?.isEditing}
+                                onEditClick={() => handleEditClick(work)}
+                                onSaveClick={handleSaveClick}
+                                onFieldChange={(fieldName, value) => handleFieldChange(fieldName, value)}
+                              />
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+
               </tbody>
             </table>
           </div>
@@ -253,7 +260,7 @@ const BusquedaTrabajo = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

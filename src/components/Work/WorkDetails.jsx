@@ -5,6 +5,7 @@ import crossMark from '../../assets/cross-mark.png'
 import { validateAdminRole, validateManagementMinimumRole, validateMechanicRole } from "../../utility/common";
 import { useAuth } from "../Context/AuthContext";
 import InputComponent from "../InputComponent";
+import PrintButton from "../PrintButton";
 
 export const WorkDetails = ({
   mechanicDetails,
@@ -42,6 +43,8 @@ export const WorkDetails = ({
     total: 'Total Presupuesto',
   }
 
+  //#region Styles
+
   const displayStatus = (value) => (value
     ? <img src={checkMark} alt="Check Mark" style={{ width: '15px', height: '15px', marginLeft: '10px' }} />
     : <img src={crossMark} alt="Cross Mark" style={{ width: '15px', height: '15px', marginLeft: '10px' }} />);
@@ -75,6 +78,7 @@ export const WorkDetails = ({
     marginLeft: "10px"
   });
 
+  //#endregion
 
   useEffect(() => {
     const fetchWorks = async () => {
@@ -88,6 +92,7 @@ export const WorkDetails = ({
         };
 
         setEditedFields(editedFieldsData);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -116,7 +121,7 @@ export const WorkDetails = ({
                     "clientId",
                     "createdAt",
                     "isEditing",
-                    "mechanic",
+                     "mechanic",
                     "carsModel",
                     "client"
                   ].includes(fieldName)
@@ -125,6 +130,7 @@ export const WorkDetails = ({
                 }
 
                 const label = fieldLabels[fieldName] || fieldName;
+
 
                 if (validateAdminRole(state.user?.role) || (validateMechanicRole(state.user?.role) && (fieldName === "observations" || fieldName === "autoParts"))) {
                   if (typeof work[fieldName] === "boolean") {
@@ -170,15 +176,16 @@ export const WorkDetails = ({
           <div>
             <p> <span style={{ fontWeight: 'bold' }}>Matricula:</span> {work.matricula}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Nombre Cliente:</span> {`${clientDetails.name} ${clientDetails.lastname}`}</p>
-            <p> <span style={{ fontWeight: 'bold' }}>Celular: </span>{work.cel}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Celular: </span>{clientDetails.cel}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Ci:</span> {clientDetails.ci}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Marca:</span> {carsModelDetails.brand.brandName}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Modelo:</span> {carsModelDetails.carName}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Año:</span> {work.year}</p>
             <p> <span style={{ fontWeight: 'bold' }}>KM:</span> {work.km}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Reclamo: </span>{work.reclame}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Repuestos:</span> {work.autoParts}</p>
             <p> <span style={{ fontWeight: 'bold' }}>Observaciones: </span>{work.observations}</p>
-            <p> <span style={{ fontWeight: 'bold' }}>Nombre del Técnico:</span> {mechanicDetails.userName}</p>
+            <p> <span style={{ fontWeight: 'bold' }}>Nombre del Técnico:</span> {mechanicDetails ? mechanicDetails.userName || "N/A" : "N/A"}</p>
 
             {validateAdminRole(state.user?.role) && (
               <>
@@ -219,10 +226,14 @@ export const WorkDetails = ({
       {
         !isEditing && (validateAdminRole(state.user?.role) || validateMechanicRole(state.user?.role)) && (
 
-          <button className="btn btn-primary" onClick={onEditClick}>
-            Edit
-          </button>
+          <div>
+            <PrintButton />
+            <button className="btn btn-primary" onClick={onEditClick}>
+              Edit
+            </button>
+          </div>
         )
+
       }
     </div >
   );

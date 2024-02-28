@@ -1,19 +1,21 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
+import InputComponent from "../components/InputComponent";
 
 const AddClientModal = ({
   show,
   handleClose,
   handleSaveClient,
   onInputChange,
+  ciError,
+  clientErrorMessage,
   name,
   lastname,
   ci,
-  ciError,
-  clientErrorMessage,
+  cel,
 }) => {
-  
+
   const handleInvalid = (e) => {
     e.target.setCustomValidity('El parametro es requerido.');
   };
@@ -34,7 +36,7 @@ const AddClientModal = ({
             value={name}
             onChange={onInputChange}
             onInvalid={handleInvalid}
-            required
+
           />
           <input
             type="text"
@@ -44,8 +46,8 @@ const AddClientModal = ({
             value={lastname}
             onChange={onInputChange}
             onInvalid={handleInvalid}
-            required
-          />
+
+          />        
           <input
             type="text"
             className="form-control m-2"
@@ -54,6 +56,17 @@ const AddClientModal = ({
             value={ci}
             onChange={onInputChange}
           />
+            <div>
+            <InputComponent
+              type="number"
+              placeholder="Celular"
+              name="cel"
+              value={cel}
+              onChange={onInputChange}
+
+            />
+          </div>
+
           {ciError && <div className="alert alert-danger error-message">{ciError}</div>}
           {clientErrorMessage && <div className="alert alert-danger error-message">{clientErrorMessage}</div>}
           <Modal.Footer>
@@ -80,6 +93,8 @@ AddClientModal.propTypes = {
   ci: PropTypes.string,
   ciError: PropTypes.string,
   clientErrorMessage: PropTypes.string,
+  cel: PropTypes.number,
+  // formState: PropTypes.object.isRequired,
 };
 
 export default AddClientModal;

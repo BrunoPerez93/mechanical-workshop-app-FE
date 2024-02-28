@@ -23,6 +23,7 @@ const DetalleTrabajo = () => {
 
     matricula: '',
     km: '',
+    year: '',
     abs: false,
     engine: false,
     airbag: false,
@@ -32,7 +33,6 @@ const DetalleTrabajo = () => {
     badPayer: false,
     normalPayer: false,
     notAccepted: false,
-    cel: '',
     reclame: '',
     autoParts: '',
     observations: '',
@@ -50,9 +50,10 @@ const DetalleTrabajo = () => {
   } = formState;
 
   const clientData = {
-    name: formState.name,
-    lastname: formState.lastname,
-    ci: formState.ci,
+    name: formState.name || '',
+    lastname: formState.lastname || '',
+    ci: formState.ci || '',
+    cel: parseFloat(formState.cel) || undefined,
   }
 
   const modelData = {
@@ -119,13 +120,18 @@ const DetalleTrabajo = () => {
   //#endregion
 
   const validateForm = () => {
-    if (!formState.matricula || !formState.km || !formState.clientId || !formState.mechanicId) {
-      setErrorMessage('Todos los campos son requeridos.');
-      setTimeout(() => {
-        setErrorMessage('');
-      }, 5000);
-      return false;
+    const requiredFields = ['matricula', 'carModelId', 'reclame', 'clientId'];
+  
+    for (const field of requiredFields) {
+      if (!formState[field]) {
+        setErrorMessage(`El campo "${field}" es obligatorio.`);
+        setTimeout(() => {
+          setErrorMessage('');
+        }, 5000);
+        return false;
+      }
     }
+  
     setErrorMessage('');
     return true;
   };
@@ -401,7 +407,7 @@ const DetalleTrabajo = () => {
         setShowClientModal(false);
       } else {
 
-        setClientErrorMessage('Cliente con Ci o Rut ya ingresado.')
+        setClientErrorMessage('Cliente ya ingresado.')
         setTimeout(() => {
           setClientErrorMessage('')
         }, 5000);
@@ -618,17 +624,19 @@ const DetalleTrabajo = () => {
       return;
     }
 
-    const { ...cleanedFormState } = formState;
+    // const { ...cleanedFormState } = formState;
 
     const updatedFormState = {
-      ...cleanedFormState,
+      // ...cleanedFormState,
+      ...formState,
       ...checkboxData,
       km: parseFloat(formState.km),
-      cel: parseFloat(formState.cel),
+      year: parseFloat(formState.km),
       handWork: parseFloat(formState.handWork),
       priceAutoParts: parseFloat(formState.priceAutoParts),
       total: parseFloat(formState.total),
       carModelId: selectedModelId,
+      mechanicId: formState.mechanicId || null,
     };
     try {
       const response = await apiCall(
@@ -687,6 +695,10 @@ const DetalleTrabajo = () => {
         onInputChange={onInputChange}
         ciError={ciError}
         clientErrorMessage={clientErrorMessage}
+        name={clientData.name}
+        lastname={clientData.lastname}
+        ci={clientData.ci}
+        cel={clientData.cel}
       />
 
       <AddModelModal

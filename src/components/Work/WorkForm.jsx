@@ -28,7 +28,7 @@ const WorkForm = ({
   const {
     matricula,
     km,
-    cel,
+    year,
     reclame,
     autoParts,
     observations,
@@ -82,7 +82,7 @@ const WorkForm = ({
         <div className="row">
           {/* MARCA */}
           <div className="col-xs-6 col-md-6 d-flex required required">
-            <h2>Marca</h2>
+            <h2>Marca*</h2>
             <SelectComponent
               options={sortedBrands}
               value={brands.brandId}
@@ -101,7 +101,7 @@ const WorkForm = ({
 
           {/* MODELO */}
           <div className="col-xs-6 col-md-6 d-flex">
-            <h2>Modelo</h2>
+            <h2>Modelo*</h2>
             <SelectComponent
               options={sortedModels}
               value={formState.carModelId}
@@ -121,14 +121,14 @@ const WorkForm = ({
 
           {/* MATRICULA */}
           <div className="d-flex col-xs-6 col-md-6">
-            <h2>Matriucla</h2>
+            <h2>Matriucla*</h2>
             <InputComponent
               type="text"
               name="matricula"
               value={matricula}
               placeholder="matricula"
               onChange={onInputChange}
-
+              required
             />
           </div>
 
@@ -141,13 +141,13 @@ const WorkForm = ({
               name="km"
               value={km}
               onChange={onInputChange}
-              required
+
             />
           </div>
 
           {/* CLIENTE */}
           <div className="d-flex col-xs-6 col-md-6">
-            <h2>Cliente</h2>
+            <h2>Cliente*</h2>
             <SelectComponent
               options={sortedClients}
               value={clients.id}
@@ -157,18 +157,18 @@ const WorkForm = ({
             <button className="btn btn-primary m-2" onClick={handleAgregarClient}>Agregar</button>
           </div>
 
-          {/* CELULAR */}
+          {/* AÑO */}
           <div className="d-flex col-xs-6 col-md-6">
-            <h2>Celular</h2>
+            <h2>Año</h2>
             <InputComponent
               type="number"
-              placeholder="celular"
-              name="cel"
-              value={cel}
+              name="year"
+              value={year}
+              placeholder="Año"
               onChange={onInputChange}
-              required
             />
           </div>
+
 
           <CheckboxGroup
             options={Object.keys(testigoData).map(key => ({ key, label: key }))}
@@ -177,7 +177,7 @@ const WorkForm = ({
 
           {/* RECLAMOS */}
           <div className="form-floating">
-            <h3>Fallos según reclamación del cliente</h3>
+            <h3>Fallos según reclamación del cliente *</h3>
             <textarea
               className="form-control m-2"
               name="reclame"
@@ -197,7 +197,7 @@ const WorkForm = ({
               value={autoParts}
               onChange={onInputChange}
               style={{ height: '100px' }}
-              required
+
             />
           </div>
 
@@ -210,7 +210,7 @@ const WorkForm = ({
               value={observations}
               onChange={onInputChange}
               style={{ height: '100px' }}
-              required
+
             />
           </div>
 
@@ -220,7 +220,7 @@ const WorkForm = ({
             options={sortedMechanics}
             value={mechanics.id}
             onChange={handleMechanicChange}
-            required
+
           />
 
           {/* PRECIOS */}
@@ -233,7 +233,7 @@ const WorkForm = ({
               name="handWork"
               value={handWork}
               onChange={onInputChange}
-              required
+
             />
           </div>
 
@@ -245,7 +245,7 @@ const WorkForm = ({
               name="priceAutoParts"
               value={priceAutoParts}
               onChange={onInputChange}
-              required
+
             />
           </div>
 
