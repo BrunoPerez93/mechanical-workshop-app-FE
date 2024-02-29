@@ -649,7 +649,7 @@ const DetalleTrabajo = () => {
       ...cleanedFormState,
       ...checkboxData,
       km: parseFloat(formState.km),
-      year: parseFloat(formState.km),
+      year: parseFloat(formState.year),
       handWork: parseFloat(formState.handWork),
       priceAutoParts: parseFloat(formState.priceAutoParts),
       total: parseFloat(formState.total),
