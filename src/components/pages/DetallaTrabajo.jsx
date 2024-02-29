@@ -50,11 +50,18 @@ const DetalleTrabajo = () => {
   } = formState;
 
   const clientData = {
-    name: formState.name || '',
-    lastname: formState.lastname || '',
-    ci: formState.ci || '',
+    name: formState.name,
+    lastname: formState.lastname || null,
+    ci: formState.ci || null,
     cel: parseFloat(formState.cel) || undefined,
   }
+
+  const resetClientData = () => {
+    onInputChange({ target: { name: 'name', value: '' } });
+    onInputChange({ target: { name: 'lastname', value: '' } });
+    onInputChange({ target: { name: 'ci', value: '' } });
+    onInputChange({ target: { name: 'cel', value: '' } });
+  };
 
   const modelData = {
     carName: formState.carName,
@@ -91,6 +98,9 @@ const DetalleTrabajo = () => {
   const [modelEditMessageError, setModelEditMessageError] = useState(null);
   const [clientErrorMessage, setClientErrorMessage] = useState(null);
 
+
+
+
   const [checkboxData, setCheckboxData] = useState({
     abs: false,
     engine: false,
@@ -121,20 +131,21 @@ const DetalleTrabajo = () => {
 
   const validateForm = () => {
     const requiredFields = ['matricula', 'carModelId', 'reclame', 'clientId'];
-  
+
     for (const field of requiredFields) {
       if (!formState[field]) {
-        setErrorMessage(`El campo "${field}" es obligatorio.`);
+        setErrorMessage(`Los campos con * son obligatorio.`);
         setTimeout(() => {
           setErrorMessage('');
         }, 5000);
         return false;
       }
     }
-  
+
     setErrorMessage('');
     return true;
   };
+
 
   //#region handleModal
 
@@ -398,12 +409,12 @@ const DetalleTrabajo = () => {
       const response = await apiCall(
         "clients",
         "POST",
-        JSON.stringify({ ...clientData, ci: clientData.ci || null })
+        JSON.stringify(clientData)
       );
 
       if (response.ok) {
         fetchClients();
-        resetForm();
+        resetClientData();
         setShowClientModal(false);
       } else {
 
@@ -623,12 +634,19 @@ const DetalleTrabajo = () => {
     if (!validateForm()) {
       return;
     }
+    
+    const {
+      name,
+      lastname,
+      ci,
+      cel,
+      ...cleanedFormState
+    } = formState;
 
-    // const { ...cleanedFormState } = formState;
+  //  const { ...cleanedFormState } = formState;
 
     const updatedFormState = {
-      // ...cleanedFormState,
-      ...formState,
+      ...cleanedFormState,
       ...checkboxData,
       km: parseFloat(formState.km),
       year: parseFloat(formState.km),

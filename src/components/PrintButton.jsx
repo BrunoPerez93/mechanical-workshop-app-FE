@@ -8,7 +8,7 @@ const PrintButton = () => {
   return (
     <button
       onClick={handlePrint}
-      className="btn btn-light"
+      className="btn btn-light m-2"
     >
       Imprimir
     </button>

@@ -25,7 +25,7 @@ const BusquedaTrabajo = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const worksPerPage = 10;
   const totalPages = works.length > 0 ? Math.ceil(works.length / worksPerPage) : 0;
-  const [editedWork, setEditedWork] = useState(null);
+  const [editedWork, setEditedWork] = useState({});
 
   const searchOptions = {
     matricula: 'Matricula',
@@ -40,8 +40,6 @@ const BusquedaTrabajo = () => {
     try {
       e.preventDefault()
 
-      const { ...workData } = editedWork;
-
       setEditedWork((prevEditedWork) => {
         const updatedWork = { ...prevEditedWork };
         return updatedWork;
@@ -50,7 +48,7 @@ const BusquedaTrabajo = () => {
       const response = await apiCall(
         `works/${editedWork.id}`,
         'PUT',
-        JSON.stringify(workData),
+        JSON.stringify(editedWork),
       );
       if (response.ok) {
         setEditedWork()
@@ -126,6 +124,7 @@ const BusquedaTrabajo = () => {
   };
 
   const handleFieldChange = (fieldName, value) => {
+
     setEditedWork((prevEditedWork) => ({
       ...prevEditedWork,
       [fieldName]: value,
@@ -207,10 +206,10 @@ const BusquedaTrabajo = () => {
                       <React.Fragment key={work.id}>
                         <tr onClick={() => handleRowClick(work)}>
                           <td>{work.matricula}</td>
-                          <td>{`${work.client?.name || "N/A"} ${work.client?.lastname}`}</td>
-                          <td>{work.carsModel?.brand?.brandName || "N/A"}</td>
-                          <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : "N/A"}</td>
-                          <td>{work.mechanic && work.mechanic.userName !== undefined ? work.mechanic.userName : "N/A"}</td>
+                          <td>{`${work.client?.name || ""} ${work.client?.lastname || ''}`}</td>
+                          <td>{work.carsModel?.brand?.brandName || ""}</td>
+                          <td>{work.createdAt ? format(new Date(work.createdAt), 'yyyy-MM-dd', { timeZone: 'UTC' }) : ""}</td>
+                          <td>{work.mechanic && work.mechanic.userName !== undefined ? work.mechanic.userName : ""}</td>
 
                         </tr>
 

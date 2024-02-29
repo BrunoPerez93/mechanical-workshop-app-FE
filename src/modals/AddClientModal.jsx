@@ -1,7 +1,7 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-import InputComponent from "../components/InputComponent";
+// import InputComponent from "../components/InputComponent";
 
 const AddClientModal = ({
   show,
@@ -33,7 +33,7 @@ const AddClientModal = ({
             className="form-control m-2"
             placeholder="Nombre del Cliente"
             name="name"
-            value={name}
+            value={name || ''}
             onChange={onInputChange}
             onInvalid={handleInvalid}
 
@@ -43,7 +43,7 @@ const AddClientModal = ({
             className="form-control m-2"
             placeholder="Apellido del Cliente"
             name="lastname"
-            value={lastname}
+            value={lastname || ''}
             onChange={onInputChange}
             onInvalid={handleInvalid}
 
@@ -53,15 +53,16 @@ const AddClientModal = ({
             className="form-control m-2"
             placeholder="Cedula o RUT"
             name="ci"
-            value={ci}
+            value={ci || ''}
             onChange={onInputChange}
           />
             <div>
-            <InputComponent
+            <input
+             className="form-control m-2"
               type="number"
               placeholder="Celular"
               name="cel"
-              value={cel}
+              value={cel || ''}
               onChange={onInputChange}
 
             />

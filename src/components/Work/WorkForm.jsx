@@ -64,7 +64,7 @@ const WorkForm = ({
 
   const sortedClients = clients.map((client) => ({
     value: client.id,
-    label: `${client.name} ${client.lastname}` + `${client.ci ? ' ' + client.ci : ''}`
+    label: `${client.name}` + `${client.lastname ? ' ' + client.lastname: ''}` + `${client.ci ? ' ' + client.ci : ''}`
   })).sort((a, b) => a.label.localeCompare(b.label));
 
   const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));
@@ -81,7 +81,7 @@ const WorkForm = ({
       <div className="container">
         <div className="row">
           {/* MARCA */}
-          <div className="col-xs-6 col-md-6 d-flex required required">
+          <div className="col-xs-6 col-md-6 d-flex required">
             <h2>Marca*</h2>
             <SelectComponent
               options={sortedBrands}
@@ -152,7 +152,7 @@ const WorkForm = ({
               options={sortedClients}
               value={clients.id}
               onChange={handleClientChange}
-              required
+              
             />
             <button className="btn btn-primary m-2" onClick={handleAgregarClient}>Agregar</button>
           </div>
