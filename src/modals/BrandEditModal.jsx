@@ -54,7 +54,6 @@ BrandEditModal.propTypes = {
   onInputChange: PropTypes.func.isRequired,
   brandEditMessage: PropTypes.string,
   selectedBrandId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  handleBrandChange: PropTypes.func.isRequired,
   brandName: PropTypes.string,
   brandEditMessageError: PropTypes.string,
 };

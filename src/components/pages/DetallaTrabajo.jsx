@@ -10,6 +10,7 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import BrandEditModal from "../../modals/BrandEditModal";
 import ModelEditModal from "../../modals/ModelEditModal";
+import ClientEditModal from "../../modals/ClientEditModal";
 
 
 const DetalleTrabajo = () => {
@@ -42,6 +43,10 @@ const DetalleTrabajo = () => {
   });
 
   const {
+    name,
+    lastname,
+    cel,
+    ci,
     brandName,
     carName,
     handWork,
@@ -83,8 +88,12 @@ const DetalleTrabajo = () => {
   const [showBrandModal, setShowBrandModal] = useState(false);
   const [showBrandModalEdit, setShowBrandModalEdit] = useState(false);
   const [showModelModalEdit, setShowModelModalEdit] = useState(false);
+  const [showClientModalEdit, setShowClientModalEdit] = useState(false);
+
 
   const [selectedBrandId, setSelectedBrandId] = useState(null);
+  const [selectedClientId, setSelectedClientId] = useState(null);
+
   const [selectedModelId, setSelectedModelId] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
 
@@ -93,8 +102,10 @@ const DetalleTrabajo = () => {
   const [modelError, setModelError] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [brandEditMessage, setBrandEditMessage] = useState(null);
+  const [clientEditMessage, setClientEditMessage] = useState(null);
   const [modelEditMessage, setModelEditMessage] = useState(null);
   const [brandEditMessageError, setBrandEditMessageError] = useState(null);
+  const [clientEditMessageError, setClientEditMessageError] = useState(null);
   const [modelEditMessageError, setModelEditMessageError] = useState(null);
   const [clientErrorMessage, setClientErrorMessage] = useState(null);
 
@@ -196,9 +207,14 @@ const DetalleTrabajo = () => {
 
     if (selectedClient) {
       onInputChange({ target: { name: 'clientId', value: selectedClient.id } });
+      handleClientSelect(selectedClient);
     } else {
       console.error(`Cliente with id ${newClientId} not found.`);
     }
+  };
+
+  const handleClientSelect = (client) => {
+    setSelectedClientId(client.id);
   };
 
   const handleMechanicChange = (event) => {
@@ -236,6 +252,10 @@ const DetalleTrabajo = () => {
     setShowModelModalEdit(true);
   };
 
+  const handleEditClient = () => {
+    setShowClientModalEdit(true);
+  };
+
   const handleCloseClientModal = () => {
     setShowClientModal(false);
     setCiError(null);
@@ -258,12 +278,17 @@ const DetalleTrabajo = () => {
     setBrandEditMessageError(null)
   };
 
+  const handleCloseClientModalEdit = () => {
+    setShowClientModalEdit(false);
+    setClientEditMessage(null);
+    setClientEditMessageError(null)
+  };
+
   const handleCloseModelModalEdit = () => {
     setShowModelModalEdit(false);
     setModelEditMessage(null);
     setModelEditMessageError(null);
   };
-
 
   const handleCheckbox = (key, value) => {
     setCheckboxData(prevData => ({
@@ -272,7 +297,6 @@ const DetalleTrabajo = () => {
     }));
     onInputChange({ target: { name: key, value } });
   };
-
 
   const handleSaveBrandEdit = async (e, selectedBrandId, brandName) => {
     try {
@@ -296,7 +320,7 @@ const DetalleTrabajo = () => {
             setBrandEditMessage('')
           }, 5000)
           fetchBrands();
-          resetForm();
+          // resetForm();
         } else {
           setBrandEditMessageError('Ocurrio un error. Contacte a su administrador.');
           setTimeout(() => {
@@ -316,6 +340,49 @@ const DetalleTrabajo = () => {
     }
   }
 
+  const handleSaveClientEdit = async (e, selectedClientId, name, lastname, ci, cel) => {
+    try {
+      e.preventDefault();
+
+      const updatedClientData = {
+        id: selectedClientId,
+        name: name,
+        lastname: lastname,
+        ci: ci,
+        cel: cel,
+      };
+      if (selectedClientId) {
+        const response = await apiCall(
+          `clients/${selectedClientId}`,
+          'PUT',
+          JSON.stringify(updatedClientData),
+        );
+
+        if (response.ok) {
+          setShowClientModalEdit(false);
+          setClientEditMessage('Cliente Modificado')
+          setTimeout(() => {
+            setClientEditMessage('')
+          }, 5000)
+          fetchClients();
+        } else {
+          setClientEditMessageError('Ocurrio un error. Contacte a su administrador.');
+          setTimeout(() => {
+            setClientEditMessageError('')
+          }, 5000)
+          console.error('Error saving client:', response.status, response.statusText);
+        }
+      } else {
+        setClientEditMessageError('Seleccione un cliente antes de editar');
+        setTimeout(() => {
+          setClientEditMessageError('')
+        }, 5000)
+      }
+
+    } catch (error) {
+      console.error('Error saving client:', error);
+    }
+  }
 
   const handleSaveModelEdit = async (e, selectedModelId, carName) => {
     try {
@@ -626,7 +693,7 @@ const DetalleTrabajo = () => {
 
   //#endregion
 
-  //#region Fetch Work
+  //#region Handle Trabajo Submit Work
 
   const handleTrabajoSubmit = async (event) => {
     event.preventDefault();
@@ -642,8 +709,6 @@ const DetalleTrabajo = () => {
       cel,
       ...cleanedFormState
     } = formState;
-
-  //  const { ...cleanedFormState } = formState;
 
     const updatedFormState = {
       ...cleanedFormState,
@@ -702,6 +767,8 @@ const DetalleTrabajo = () => {
         errorMessage={errorMessage}
         handleEditBrand={handleEditBrand}
         handleEditModel={handleEditModel}
+        handleEditClient={handleEditClient}
+        handleClientSelect={handleClientSelect}
       />
 
 
@@ -749,8 +816,6 @@ const DetalleTrabajo = () => {
         brandEditMessage={brandEditMessage}
         onInputChange={onInputChange}
         selectedBrandId={selectedBrandId}
-        handleBrandChange={handleBrandChange}
-        brands={brands}
         brandName={brandName}
         handleSaveBrandEdit={(e) => handleSaveBrandEdit(e, selectedBrandId, brandName)}
         brandEditMessageError={brandEditMessageError}
@@ -772,6 +837,20 @@ const DetalleTrabajo = () => {
         carName={carName}
         modelEditMessageError={modelEditMessageError}
 
+      />
+
+      <ClientEditModal
+         show={showClientModalEdit}
+         handleClose={handleCloseClientModalEdit}
+         clientEditMessage={clientEditMessage}
+         onInputChange={onInputChange}
+         selectedClientId={selectedClientId}
+         name={name}
+         lastname={lastname}
+         ci={ci}
+         cel={cel}
+         handleSaveClientEdit={(e) => handleSaveClientEdit(e, selectedClientId, name, lastname, ci, cel)}
+         clientEditMessageError={clientEditMessageError}
       />
 
     </>

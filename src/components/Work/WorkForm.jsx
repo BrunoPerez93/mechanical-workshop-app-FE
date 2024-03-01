@@ -23,7 +23,9 @@ const WorkForm = ({
   handleMechanicChange,
   errorMessage,
   handleEditBrand,
-  handleEditModel
+  handleEditModel,
+  handleEditClient,
+  handleClientSelect,
 }) => {
   const {
     matricula,
@@ -64,12 +66,13 @@ const WorkForm = ({
 
   const sortedClients = clients.map((client) => ({
     value: client.id,
-    label: `${client.name}` + `${client.lastname ? ' ' + client.lastname: ''}` + `${client.ci ? ' ' + client.ci : ''}`
+    label: `${client.name}` + `${client.lastname ? ' ' + client.lastname : ''}` + `${client.ci ? ' ' + client.ci : ''}`
   })).sort((a, b) => a.label.localeCompare(b.label));
 
   const sortedMechanics = mechanics.map((mechanic) => ({ value: mechanic.id, label: mechanic.userName })).sort((a, b) => a.label.localeCompare(b.label));
 
   //#endregion
+
 
   return (
     <form onSubmit={handleTrabajoSubmit}>
@@ -88,9 +91,17 @@ const WorkForm = ({
               value={brands.brandId}
               onChange={handleBrandChange}
             />
-            <button className="btn btn-primary m-2" onClick={handleAgregarBrand}>Agregar</button>
+            <button
+              type="button"
+              className="btn btn-primary m-2"
+              onClick={handleAgregarBrand}
+            >
+              Agregar
+            </button>
+
             {validateAdminRole(state.user.role) && (
               <button
+                type="button"
                 className="btn btn-primary m-2"
                 onClick={handleEditBrand}
               >
@@ -108,9 +119,17 @@ const WorkForm = ({
               onChange={handleModelChange}
 
             />
-            <button className="btn btn-primary m-2" onClick={handleAgregarModel}>Agregar</button>
+            <button
+              className="btn btn-primary m-2"
+              type="button"
+              onClick={handleAgregarModel}
+            >
+              Agregar
+            </button>
+
             {validateAdminRole(state.user.role) && (
               <button
+                type="button"
                 className="btn btn-primary m-2"
                 onClick={handleEditModel}
               >
@@ -151,10 +170,28 @@ const WorkForm = ({
             <SelectComponent
               options={sortedClients}
               value={clients.id}
-              onChange={handleClientChange}
-              
+              onChange={(event) => {
+                handleClientChange(event);
+                handleClientSelect(clients.find((client) => client.id === parseInt(event.target.value)));
+              }}
             />
-            <button className="btn btn-primary m-2" onClick={handleAgregarClient}>Agregar</button>
+            <button
+              type="button"
+              className="btn btn-primary m-2"
+              onClick={handleAgregarClient}
+            >
+              Agregar
+            </button>
+
+            {validateAdminRole(state.user.role) && (
+              <button
+                type="button"
+                className="btn btn-primary m-2"
+                onClick={handleEditClient}
+              >
+                Editar
+              </button>
+            )}
           </div>
 
           {/* AÑO */}
@@ -288,6 +325,8 @@ WorkForm.propTypes = {
   errorMessage: PropTypes.string,
   handleEditBrand: PropTypes.func,
   handleEditModel: PropTypes.func,
+  handleEditClient: PropTypes.func,
+  handleClientSelect: PropTypes.func,
 };
 
 export default WorkForm;
