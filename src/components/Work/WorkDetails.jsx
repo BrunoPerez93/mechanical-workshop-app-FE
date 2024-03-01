@@ -4,7 +4,6 @@ import checkMark from '../../assets/check-mark.png'
 import crossMark from '../../assets/cross-mark.png'
 import { apiCall, validateAdminRole, validateManagementMinimumRole, validateMechanicRole } from "../../utility/common";
 import { useAuth } from "../Context/AuthContext";
-import InputComponent from "../InputComponent";
 import PrintButton from "../PrintButton";
 import SelectComponent from "../SelectComponent";
 
@@ -138,7 +137,6 @@ useEffect(() => {
                 if (
                   [
                     "id",
-                    // "mechanicId",
                     "mechanic",
                     "carModelId",
                     "clientId",
@@ -199,7 +197,7 @@ useEffect(() => {
                     return (
                       <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
                         <label>{label}</label>
-                        <InputComponent
+                        <input
                           type="text"
                           className="form-control"
                           value={editedFields[fieldName] ?? work[fieldName]}

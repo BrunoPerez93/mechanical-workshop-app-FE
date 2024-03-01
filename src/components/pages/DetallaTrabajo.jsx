@@ -217,6 +217,10 @@ const DetalleTrabajo = () => {
     setSelectedClientId(client.id);
   };
 
+  const handleModelSelect = (model) => {
+    setSelectedModelId(model.id);
+  };
+
   const handleMechanicChange = (event) => {
     const newMechanicId = event.target.value;
     const slectedMechanic = mechanics.find((mechanic) => mechanic.id === parseInt(newMechanicId));
@@ -248,7 +252,6 @@ const DetalleTrabajo = () => {
 
   const handleEditModel = () => {
     setSelectedModelId(selectedModelId)
-    onInputChange({ target: { name: 'carName', value: carName } });
     setShowModelModalEdit(true);
   };
 
@@ -366,7 +369,7 @@ const DetalleTrabajo = () => {
           }, 5000)
           fetchClients();
         } else {
-          setClientEditMessageError('Ocurrio un error. Contacte a su administrador.');
+          setClientEditMessageError('Cedula ya ingresada.');
           setTimeout(() => {
             setClientEditMessageError('')
           }, 5000)
@@ -421,7 +424,7 @@ const DetalleTrabajo = () => {
               updatedModelsResponse.statusText
             );
           }
-          resetForm();
+        
         } else {
           setModelEditMessageError('Ocurrio un error. Contacte a su administrador.');
           setTimeout(() => {
@@ -707,6 +710,8 @@ const DetalleTrabajo = () => {
       lastname,
       ci,
       cel,
+      brandName,
+      carName,
       ...cleanedFormState
     } = formState;
 
@@ -769,6 +774,7 @@ const DetalleTrabajo = () => {
         handleEditModel={handleEditModel}
         handleEditClient={handleEditClient}
         handleClientSelect={handleClientSelect}
+        handleModelSelect={handleModelSelect}
       />
 
 

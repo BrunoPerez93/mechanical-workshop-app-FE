@@ -31,7 +31,6 @@ const ClientEditModal = ({
             name="name"
             value={name || ''}
             onChange={onInputChange}
-            required
           />
 
           <input

@@ -26,6 +26,7 @@ const WorkForm = ({
   handleEditModel,
   handleEditClient,
   handleClientSelect,
+  handleModelSelect,
 }) => {
   const {
     matricula,
@@ -116,7 +117,10 @@ const WorkForm = ({
             <SelectComponent
               options={sortedModels}
               value={formState.carModelId}
-              onChange={handleModelChange}
+              onChange={(event) => {
+                handleModelChange(event);
+                handleModelSelect(models.find((model) => model.id === parseInt(event.target.value)));
+              }}
 
             />
             <button
@@ -327,6 +331,7 @@ WorkForm.propTypes = {
   handleEditModel: PropTypes.func,
   handleEditClient: PropTypes.func,
   handleClientSelect: PropTypes.func,
+  handleModelSelect: PropTypes.func,
 };
 
 export default WorkForm;
