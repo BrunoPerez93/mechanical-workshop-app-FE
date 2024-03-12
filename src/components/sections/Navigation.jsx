@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { Navbar, Nav } from "react-bootstrap"
 import { logout, validateAdminRole, validateManagementMinimumRole } from "../../utility/common";
 import { useState } from "react";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 
 const Navigation = () => {
 

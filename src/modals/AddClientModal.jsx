@@ -1,7 +1,6 @@
 
 import { Modal, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
-// import InputComponent from "../components/InputComponent";
 
 const AddClientModal = ({
   show,
@@ -94,8 +93,7 @@ AddClientModal.propTypes = {
   ci: PropTypes.string,
   ciError: PropTypes.string,
   clientErrorMessage: PropTypes.string,
-  cel: PropTypes.number,
-  // formState: PropTypes.object.isRequired,
+  cel: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 };
 
 export default AddClientModal;

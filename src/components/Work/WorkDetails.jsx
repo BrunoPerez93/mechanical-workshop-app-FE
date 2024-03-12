@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import checkMark from '../../assets/check-mark.png'
 import crossMark from '../../assets/cross-mark.png'
 import { apiCall, validateAdminRole, validateManagementMinimumRole, validateMechanicRole } from "../../utility/common";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import PrintButton from "../PrintButton";
 import SelectComponent from "../SelectComponent";
 
@@ -200,7 +200,7 @@ useEffect(() => {
                         <input
                           type="text"
                           className="form-control"
-                          value={editedFields[fieldName] ?? work[fieldName]}
+                          value={editedFields[fieldName] !== undefined ? editedFields[fieldName] : work[fieldName] ?? ''}
                           onChange={(e) => onFieldChange(fieldName, e.target.value)}
                         />
                       </div>

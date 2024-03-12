@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
-import useForm from "../../hooks/useForm";
-import '../styles/detalleDeTrabajo.css'
-import AddClientModal from "../../modals/AddClientModal";
-import AddModelModal from "../../modals/AddModelModal";
-import AddBrandModal from "../../modals/AddBrandModal";
-import { apiCall } from "../../utility/common";
-import WorkForm from "../Work/WorkForm";
+import useForm from "../hooks/useForm";
+import AddClientModal from "../modals/AddClientModal";
+import AddModelModal from "../modals/AddModelModal";
+import AddBrandModal from "../modals/AddBrandModal";
+import { apiCall } from "../utility/common";
+import WorkForm from "../components/Work/WorkForm";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import BrandEditModal from "../../modals/BrandEditModal";
-import ModelEditModal from "../../modals/ModelEditModal";
-import ClientEditModal from "../../modals/ClientEditModal";
+import BrandEditModal from "../modals/BrandEditModal";
+import ModelEditModal from "../modals/ModelEditModal";
+import ClientEditModal from "../modals/ClientEditModal";
 
 
 const DetalleTrabajo = () => {
@@ -201,22 +200,6 @@ const DetalleTrabajo = () => {
     }
   };
 
-  const handleClientChange = (event) => {
-    const newClientId = event.target.value;
-    const selectedClient = clients.find((client) => client.id === parseInt(newClientId));
-
-    if (selectedClient) {
-      onInputChange({ target: { name: 'clientId', value: selectedClient.id } });
-      handleClientSelect(selectedClient);
-    } else {
-      console.error(`Cliente with id ${newClientId} not found.`);
-    }
-  };
-
-  const handleClientSelect = (client) => {
-    setSelectedClientId(client.id);
-  };
-
   const handleModelSelect = (model) => {
     setSelectedModelId(model.id);
   };
@@ -323,7 +306,6 @@ const DetalleTrabajo = () => {
             setBrandEditMessage('')
           }, 5000)
           fetchBrands();
-          // resetForm();
         } else {
           setBrandEditMessageError('Ocurrio un error. Contacte a su administrador.');
           setTimeout(() => {
@@ -767,13 +749,12 @@ const DetalleTrabajo = () => {
         handleCheckbox={handleCheckbox}
         onInputChange={onInputChange}
         handleAgregarClient={handleAgregarClient}
-        handleClientChange={handleClientChange}
         handleMechanicChange={handleMechanicChange}
         errorMessage={errorMessage}
         handleEditBrand={handleEditBrand}
         handleEditModel={handleEditModel}
         handleEditClient={handleEditClient}
-        handleClientSelect={handleClientSelect}
+        setSelectedClientId={setSelectedClientId}
         handleModelSelect={handleModelSelect}
       />
 

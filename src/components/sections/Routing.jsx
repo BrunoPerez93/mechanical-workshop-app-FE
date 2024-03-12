@@ -1,12 +1,12 @@
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
-import DetalleTrabajo from "../pages/DetallaTrabajo";
-import AdministrarUsuario from '../pages/AdministrarUsuario'
-import AdministrarTecnico from '../pages/AdministrarTecnico'
-import BusquedaTrabajo from '../pages/BusquedaTrabajo'
-import LoginPage from "../pages/LoginPage";
+import DetalleTrabajo from "../../pages/DetallaTrabajo";
+import AdministrarUsuario from "../../pages/AdministrarUsuario";
+import AdministrarTecnico from "../../pages/AdministrarTecnico";
+import BusquedaTrabajo from "../../pages/BusquedaTrabajo";
+import LoginPage from "../../pages/LoginPage";
 import Navigation from "./Navigation";
 import PropTypes from "prop-types";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { validateAdminRole, validateManagementMinimumRole } from "../../utility/common";
 
 

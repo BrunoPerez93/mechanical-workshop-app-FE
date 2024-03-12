@@ -1,37 +1,27 @@
 import { useState, useEffect } from "react";
-import useForm from "../../hooks/useForm";
-import { apiCall } from "../../utility/common";
-import { AdminForm, UserList } from "../Users/AdminForm";
+import useForm from '../hooks/useForm'
+import { apiCall } from "../utility/common";
+import { MechanicForm, MechanicList } from "../components/Mechanics/MechanicForm";
 
-const AdministrarUsuario = () => {
+const AdministrarTecnico = () => {
 
-
-  const [users, setUsers] = useState([]);
+  const [mechanics, setMechanics] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
-  const [failMessage, setFailMessage] = useState('');
 
   const { formState, onInputChange, resetForm } = useForm({
-    userName: "",
-    password: "",
-    role: "",
+    userName: '',
   });
 
-  const searchOptions = {
-    Admin: "Administrador",
-    Management: "Secretaria",
-    Mechanic: "Mecanico",
-  };
-
-  const fetchUsers = async () => {
+  const fetchMechanic = async () => {
     try {
       const response = await apiCall(
-        "users",
+        "mechanics",
         "GET",
       );
 
       if (response.ok) {
-        const userList = await response.json();
-        setUsers(userList);
+        const mechanicsList = await response.json();
+        setMechanics(mechanicsList);
       } else {
         console.error(
           "Error en la respuesta del servidor al pedir el listado",
@@ -44,31 +34,26 @@ const AdministrarUsuario = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchMechanic();
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     try {
       const response = await apiCall(
-        "users",
+        "mechanics",
         "POST",
         JSON.stringify(formState),
       );
 
       if (response.ok) {
-        fetchUsers();
+        fetchMechanic();
         resetForm();
-        setSuccessMessage('Usuario creado.');
+        setSuccessMessage('Tecnico creado')
         setTimeout(() => {
           setSuccessMessage('');
         }, 5000);
       } else {
-        setFailMessage('Usuario ya ingresado utilice otro nombre.');
-        setTimeout(() => {
-          setFailMessage('');
-        }, 5000);
         console.error(
           "Error en la respuesta del servidor al crear el usuario",
           response.statusText
@@ -79,13 +64,10 @@ const AdministrarUsuario = () => {
     }
   };
 
-
   return (
-
     <div className="container">
       <div className="row">
-
-        <AdminForm
+        <MechanicForm
           formState={formState}
           onInputChange={onInputChange}
           resetForm={resetForm}
@@ -96,18 +78,10 @@ const AdministrarUsuario = () => {
           <div className="alert alert-success mt-2">{successMessage}</div>
         )}
 
-        {failMessage && (
-          <div className="alert alert-danger mt-2">{failMessage}</div>
-        )}
-
-        <UserList
-          users={users}
-          searchOptions={searchOptions}
-        />
-
+        <MechanicList mechanics={mechanics} />
       </div>
     </div>
   )
 }
 
-export default AdministrarUsuario
+export default AdministrarTecnico

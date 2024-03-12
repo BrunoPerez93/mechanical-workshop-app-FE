@@ -85,7 +85,7 @@ ClientEditModal.propTypes = {
   name: PropTypes.string,
   lastname: PropTypes.string,
   ci: PropTypes.string,
-  cel:  PropTypes.number,
+  cel: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   handleSaveClientEdit: PropTypes.func,
   clientEditMessageError: PropTypes.string,
 };

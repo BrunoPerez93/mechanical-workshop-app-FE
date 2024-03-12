@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import useForm from "../../hooks/useForm";
-import { apiCall } from "../../utility/common";
-import InputComponent from "../InputComponent";
-import { WorkDetails } from "../Work/WorkDetails";
+import useForm from "../hooks/useForm";
+import { apiCall } from "../utility/common";
+import InputComponent from "../components/InputComponent";
+import { WorkDetails } from "../components/Work/WorkDetails";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, formatISO } from 'date-fns';
@@ -31,7 +31,6 @@ const BusquedaTrabajo = () => {
     matricula: 'Matricula',
     brandNames: 'Marca',
     createdAt: 'Fecha',
-    // mechanicName: 'Tecnico',
     clientName: 'Cliente',
   };
 

@@ -1,9 +1,9 @@
 
 import { useNavigate } from "react-router-dom";
-import useForm from "../../hooks/useForm";
-import InputComponent from "../InputComponent";
+import useForm from "../hooks/useForm";
+import InputComponent from "../components/InputComponent";
 import { useState } from "react";
-import { apiCall } from "../../utility/common";
+import { apiCall } from "../utility/common";
 import { useAuth } from "../Context/AuthContext";
 
 

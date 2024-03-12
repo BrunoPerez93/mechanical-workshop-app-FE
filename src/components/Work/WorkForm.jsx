@@ -2,7 +2,7 @@ import SelectComponent from "../SelectComponent";
 import InputComponent from "../InputComponent";
 import CheckboxGroup from "../CheckBoxGroup";
 import PropTypes from "prop-types";
-import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../../Context/AuthContext";
 import { validateAdminRole } from "../../utility/common";
 
 const WorkForm = ({
@@ -19,13 +19,12 @@ const WorkForm = ({
   handleCheckbox,
   onInputChange,
   handleAgregarClient,
-  handleClientChange,
   handleMechanicChange,
   errorMessage,
   handleEditBrand,
   handleEditModel,
   handleEditClient,
-  handleClientSelect,
+  setSelectedClientId,
   handleModelSelect,
 }) => {
   const {
@@ -56,6 +55,7 @@ const WorkForm = ({
   const currentDate = new Date();
   const formattedDate = `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`;
   const { state } = useAuth();
+  
 
   //#region Sorted data
 
@@ -75,9 +75,26 @@ const WorkForm = ({
   //#endregion
 
 
+  const handleClientChange = (event) => {
+    const newClientId = event.target.value;
+    const selectedClient = clients.find((client) => client.id === parseInt(newClientId));
+
+    if (selectedClient) {
+      onInputChange({ target: { name: 'clientId', value: selectedClient.id } });
+      handleClientSelect(selectedClient);
+    } else {
+      console.error(`Cliente with id ${newClientId} not found.`);
+    }
+  };
+
+  const handleClientSelect = (client) => {
+    setSelectedClientId(client.id);
+  };
+
+
   return (
     <form onSubmit={handleTrabajoSubmit}>
-      <div className="title">
+      <div style={{ textAlign: 'center' }}>
         <h1>Detalles del trabajo</h1>
         <span>Fecha: {formattedDate}</span>
       </div>
@@ -324,13 +341,12 @@ WorkForm.propTypes = {
   handleCheckbox: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   handleAgregarClient: PropTypes.func.isRequired,
-  handleClientChange: PropTypes.func.isRequired,
   handleMechanicChange: PropTypes.func.isRequired,
   errorMessage: PropTypes.string,
   handleEditBrand: PropTypes.func,
   handleEditModel: PropTypes.func,
   handleEditClient: PropTypes.func,
-  handleClientSelect: PropTypes.func,
+  setSelectedClientId: PropTypes.func,
   handleModelSelect: PropTypes.func,
 };
 
