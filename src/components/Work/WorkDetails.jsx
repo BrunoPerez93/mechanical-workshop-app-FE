@@ -87,7 +87,7 @@ export const WorkDetails = ({
 
   //#endregion
 
-useEffect(() => {
+  useEffect(() => {
     const fetchMechanics = async () => {
       try {
         const mechanicsResponse = await apiCall("mechanics", "GET");
@@ -153,7 +153,7 @@ useEffect(() => {
                 if (fieldName === 'mechanicId' && mechanics.length > 0) {
                   return (
                     <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                      <label>{fieldLabels[fieldName]}</label>
+                      <h5>{fieldLabels[fieldName]}</h5>
                       <SelectComponent
                         options={mechanics.map((mechanic) => ({
                           value: mechanic.id,
@@ -196,12 +196,22 @@ useEffect(() => {
                   } else {
                     return (
                       <div key={fieldName} className="form-group col-sm-12 col-md-12 mt-2 mb-2">
-                        <label>{label}</label>
+                        <h5>{label}</h5>
                         <input
                           type="text"
                           className="form-control"
                           value={editedFields[fieldName] !== undefined ? editedFields[fieldName] : work[fieldName] ?? ''}
-                          onChange={(e) => onFieldChange(fieldName, e.target.value)}
+                          onChange={(e) => {
+                            const { value, selectionStart, selectionEnd } = e.target;
+                            setEditedFields(prevEditedFields => ({
+                              ...prevEditedFields,
+                              [fieldName]: value,
+                            }));
+                            requestAnimationFrame(() => {
+                              e.target.setSelectionRange(selectionStart, selectionEnd);
+                            });
+                            onFieldChange(fieldName, e.target.value)
+                          }}
                         />
                       </div>
                     );
@@ -226,7 +236,7 @@ useEffect(() => {
             </p>
             <p>
               <span style={{ fontWeight: 'bold' }}>Nombre Cliente:</span>
-              {` ${clientDetails.name} ${clientDetails?.lastname || '' }`}
+              {` ${clientDetails.name} ${clientDetails?.lastname || ''}`}
             </p>
             <p>
               <span style={{ fontWeight: 'bold' }}>Celular: </span>

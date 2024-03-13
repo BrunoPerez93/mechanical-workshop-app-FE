@@ -13,7 +13,7 @@ const BusquedaTrabajo = () => {
   const { formState, onInputChange } = useForm({
     searchSelect: '',
     search: '',
-    datePickerValue: null,
+    datePickerValue: '',
   });
 
 
